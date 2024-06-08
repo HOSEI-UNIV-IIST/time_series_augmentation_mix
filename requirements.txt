@@ -1,0 +1,12 @@
+#tensorflow-gpu==2.4.1
+tensorflow==2.13.1
+#keras==2.2.4
+keras
+#numpy==1.19.5
+numpy
+#matplotlib==2.2.2
+matplotlib
+#scikit-image==0.15.0
+scikit-image
+tqdm
+#tensorflow==2.4.1
