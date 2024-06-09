@@ -1,12 +1,6 @@
-#tensorflow-gpu==2.4.1
-tensorflow==2.13.1
-#keras==2.2.4
-keras
-#numpy==1.19.5
-numpy
-#matplotlib==2.2.2
-matplotlib
-#scikit-image==0.15.0
-scikit-image
-tqdm
-#tensorflow==2.4.1
+# pytorch::pytorch torchvision torchaudio tensorboard -c pytorch
+# torch==2.3.1+cu121
+# NVIDIA CUDA 12.1
+numpy==1.26.4
+matplotlib==3.9.0
+tqdm==4.66.4

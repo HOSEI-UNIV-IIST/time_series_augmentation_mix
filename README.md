@@ -13,7 +13,7 @@ This code was developed in Python 3.11.0. and requires Tensorflow 2.13.1 and Ker
 ### Normal Install
 
 ```
-pip install tensorflow-gpu==2.13.1 keras==2.13.1 numpy1.26.4' matplotlib==3.9.0 scikit-image==0.22.0 tqdm==4.66.4
+pip install torch==2.3.1 keras==2.13.1 numpy1.26.4' matplotlib==3.9.0 scikit-image==0.22.0 tqdm==4.66.4
 ```
 
 ### Dataset
