@@ -11,7 +11,6 @@ Univ: Hosei University
 Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
-
 import argparse
 import os
 
@@ -31,11 +30,11 @@ from utils.input_data import get_datasets, run_augmentation
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Runs augmentation model.')
     # General settings
-    parser.add_argument('--gpus', type=str, default="0", help="Sets CUDA_VISIBLE_DEVICES")
+    parser.add_argument('--gpus', type=int, default=1, help="Number of GPUs to use")
     parser.add_argument('--dataset', type=str, default='CBF', help='Name of dataset to test (required, ex: unipen1a)')
     parser.add_argument('--model', type=str, default="lstm1", help="Set model name")
     parser.add_argument('--train', default=True, action="store_true", help="Train?")
-    parser.add_argument('--save', default=True, action="store_true", help="save to disk?")
+    parser.add_argument('--save', default=True, action="store_true", help="Save to disk?")
 
     # Augmentation
     parser.add_argument('--augmentation_ratio', type=int, default=1, help="How many times to augment")
@@ -43,8 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--original', type=bool, default=False, help="Original dataset without augmentation")
     parser.add_argument('--jitter', type=bool, default=False, help="Jitter preset augmentation")
     parser.add_argument('--scaling', type=bool, default=False, help="Scaling preset augmentation")
-    parser.add_argument('--permutation', type=bool, default=False,
-                        help="Equal Length Permutation preset augmentation")
+    parser.add_argument('--permutation', type=bool, default=False, help="Equal Length Permutation preset augmentation")
     parser.add_argument('--randompermutation', type=bool, default=False,
                         help="Random Length Permutation preset augmentation")
     parser.add_argument('--magwarp', type=bool, default=False, help="Magnitude warp preset augmentation")
@@ -56,10 +54,8 @@ if __name__ == '__main__':
     parser.add_argument('--dtwwarp', type=bool, default=False, help="DTW warp preset augmentation")
     parser.add_argument('--shapedtwwarp', type=bool, default=False, help="Shape DTW warp preset augmentation")
     parser.add_argument('--wdba', type=bool, default=False, help="Weighted DBA preset augmentation")
-    parser.add_argument('--discdtw', type=bool, default=False,
-                        help="Discrimitive DTW warp preset augmentation")
-    parser.add_argument('--discsdtw', type=bool, default=False,
-                        help="Discrimitive shapeDTW warp preset augmentation")
+    parser.add_argument('--discdtw', type=bool, default=False, help="Discriminative DTW warp preset augmentation")
+    parser.add_argument('--discsdtw', type=bool, default=False, help="Discriminative shapeDTW warp preset augmentation")
     parser.add_argument('--extra_tag', type=str, default="default", help="Anything extra")
 
     # File settings
@@ -71,7 +67,7 @@ if __name__ == '__main__':
     parser.add_argument('--train_labels_file', type=str, default="", help="Train label file")
     parser.add_argument('--test_data_file', type=str, default="", help="Test data file")
     parser.add_argument('--test_labels_file', type=str, default="", help="Test label file")
-    parser.add_argument('--test_split', type=int, default=0, help="test split")
+    parser.add_argument('--test_split', type=int, default=0, help="Test split")
     parser.add_argument('--weight_dir', type=str, default="weights", help="Weight path")
     parser.add_argument('--log_dir', type=str, default="logs", help="Log path")
     parser.add_argument('--output_dir', type=str, default="output", help="Output path")
@@ -81,16 +77,26 @@ if __name__ == '__main__':
     # Network settings
     parser.add_argument('--optimizer', type=str, default="sgd", help="Which optimizer")
     parser.add_argument('--lr', type=float, default=1e-3, help="Learning Rate")
-    parser.add_argument('--validation_split', type=int, default=0, help="size of validation set")
+    parser.add_argument('--validation_split', type=int, default=0, help="Size of validation set")
     parser.add_argument('--iterations', type=int, default=10000, help="Number of iterations")
-    parser.add_argument('--batch_size', type=int, default=256, help="batch size")
-    parser.add_argument('--verbose', type=int, default=1, help="verbose")
+    parser.add_argument('--batch_size', type=int, default=256, help="Batch size")
+    parser.add_argument('--verbose', type=int, default=1, help="Verbose")
 
     args = parser.parse_args()
-    # print(args)
 
+    # Check if CUDA is available and set the device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using device: {device}')
+
+    # Specify the GPUs to use if available
+    if torch.cuda.is_available():
+        # Ensure that there are enough GPUs available
+        assert torch.cuda.device_count() >= args.gpus, f"Not enough GPUs available. Required: {args.gpus}, Available: {torch.cuda.device_count()}"
+        # Specify the GPUs to use
+        gpu_ids = [i for i in range(args.gpus)]
+        os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, gpu_ids))
+    else:
+        gpu_ids = []
 
     # Number of classes and dimensions
     nb_class = ds.nb_classes(args.dataset)
@@ -142,6 +148,12 @@ if __name__ == '__main__':
     # Assume `mod.get_model` returns a PyTorch model
     model = mod.get_model(args.model, input_shape, nb_class).to(device)
 
+    # Wrap the model using DataParallel to use multiple GPUs if available
+    if torch.cuda.is_available():
+        model = nn.DataParallel(model, device_ids=gpu_ids)
+        # Move the model to the GPUs
+        model.to(device)
+
     # Define optimizer and learning rate scheduler
     if args.optimizer == "adam":
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -176,6 +188,7 @@ if __name__ == '__main__':
         if not os.path.exists(weight_dir):
             os.mkdir(weight_dir)
 
+
         if not os.path.exists(args.log_dir):
             os.mkdir(args.log_dir)
         if not os.path.exists(os.path.join(args.log_dir, str(device))):
@@ -188,7 +201,8 @@ if __name__ == '__main__':
             os.mkdir(log_dir)
 
         # Initialize the CSV logger
-        csv_logger = SummaryWriter(log_dir=log_dir)
+        csv_logger = SummaryWriter(log_dir=os.path.join(log_dir, '%s.csv' % model_prefix))
+
 
     # Ensure compatibility before creating DataLoaders
     if not args.original:
@@ -222,13 +236,11 @@ if __name__ == '__main__':
             reduce_lr.step(loss.item())
 
         if args.save:
-            torch.save(model.state_dict(),
-                       os.path.join(args.weight_dir, model_prefix, f"{model_prefix}_final_weights.pth"))
+            torch.save(model.state_dict(), os.path.join(weight_dir, f"{model_prefix}_final_weights.pth"))
 
     # Evaluation
     else:
-        model.load_state_dict(
-            torch.load(os.path.join(args.weight_dir, model_prefix, f"{model_prefix}_final_weights.pth")))
+        model.load_state_dict(torch.load(os.path.join(weight_dir, f"{model_prefix}_final_weights.pth")))
     model.eval()
     correct = 0
     total = 0
@@ -255,13 +267,12 @@ if __name__ == '__main__':
         np.savetxt(os.path.join(args.output_dir, f"{model_prefix}_{100 * correct / total:.15f}.txt"), y_preds, fmt="%d")
 
     # Load best model and evaluate
-    if os.path.exists(os.path.join(args.weight_dir, model_prefix, f"{model_prefix}_best_train_acc_weights.pth")):
-        model.load_state_dict(
-            torch.load(os.path.join(args.weight_dir, model_prefix, f"{model_prefix}_best_train_acc_weights.pth")))
+    if os.path.exists(os.path.join(weight_dir, f"{model_prefix}_best_train_acc_weights.pth")):
+        model.load_state_dict(torch.load(os.path.join(weight_dir, f"{model_prefix}_best_train_acc_weights.pth")))
         model.eval()
         correct = 0
         total = 0
-        with torch.no.grad():
+        with torch.no_grad():
             for data, labels in test_loader:
                 data, labels = data.to(device), labels.to(device)
                 outputs = model(data)

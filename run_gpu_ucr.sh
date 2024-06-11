@@ -5,10 +5,10 @@ source ~/.bashrc
 hostname
 echo USED GPUs=$CUDA_VISIBLE_DEVICES
 pwd
-source activate time_serie_torch
+source activate time_series_augmix
 
 # Default value for SCRIPT_DIR
-DEFAULT_SCRIPT_DIR=""
+DEFAULT_SCRIPT_DIR="/home/23r8105_messou/tsa/time_series_augmentation_mix"
 
 # Attempt to determine the directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -53,6 +53,6 @@ aug_tech=('--original' '--jitter' '--scaling' '--permutation' '--randompermutati
 # Loop over each dataset and augmentation technique and run the Python script
 for dataset in $datasets; do
     for aug in "${aug_tech[@]}"; do
-        python3 main.py --gpus=5 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=4 --model=lstm1
+        python3 main.py --gpus=5 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=1 --model=lstm2
     done
 done
