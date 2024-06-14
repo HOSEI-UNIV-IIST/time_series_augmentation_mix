@@ -25,6 +25,24 @@ def argument_parser():
     parser.add_argument('--save', default=True, action="store_true", help="Save to disk?")
     # Augmentation
     parser.add_argument('--augmentation_ratio', type=int, default=1, help="How many times to augment")
+    parser.add_argument('--augmentation_method', type=str, default="simple",
+                        choices=['simple', 'sequential_magnitude1', 'sequential_magnitude2', 'sequential_magnitude3',
+                                 'sequential_magnitude4', 'sequential_time1', 'sequential_time2', 'sequential_time3',
+                                 'sequential_time4', 'sequential_time5', 'parallel_magnitude1', 'parallel_magnitude2',
+                                 'parallel_magnitude3', 'parallel_magnitude4', 'parallel_time1',
+                                 'parallel_time2', 'parallel_time3', 'parallel_time4', 'parallel_time5',
+
+                                 'sequential_combined1', 'sequential_combined2',
+                                 'sequential_combined3', 'sequential_combined4', 'sequential_combined5',
+                                 'sequential_combined6', 'sequential_combined7', 'sequential_combined8',
+                                 'sequential_combined9', 'sequential_combined10', 'sequential_combined11',
+                                 'sequential_combined12', 'sequential_combined13', 'sequential_combined14',
+                                 'sequential_combined15', 'sequential_combined16', 'sequential_combined17',
+                                 'sequential_combined18', 'sequential_combined19', 'sequential_combined20',
+                                 'parallel_combined1', 'parallel_combined2', 'parallel_combined3', 'parallel_combined4',
+                                 'parallel_combined5', ],
+                        help="Augmentation method")
+    parser.add_argument('--num_augmentations', type=int, default=3, help="Number of random augmentations to apply")
     parser.add_argument('--seed', type=int, default=20240609, help="Randomization seed")
     parser.add_argument('--original', type=bool, default=False, help="Original dataset without augmentation")
     parser.add_argument('--jitter', type=bool, default=False, help="Jitter preset augmentation")

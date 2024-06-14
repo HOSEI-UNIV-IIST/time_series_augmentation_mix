@@ -107,7 +107,6 @@ def augment_data(x, y, method='sequential', num_augmentations=3):
 | Scaling           | Time Warping       |
 | Magnitude Warping | Window Warping     |
 |                   | Window Slicing     |
-|                   | Random Permutation |
 
 - Pattern-Based: Not used
 

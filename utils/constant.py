@@ -22,5 +22,6 @@ ucr_data = [
     "Yoga",
 ]
 
-aug_tech = ['--original', '--jitter', '--scaling', '--permutation', '--randompermutation', '--magwarp', '--timewarp',
+aug_tech = ['--original', '--jitter', '--scaling',
+            '--permutation', '--magwarp', '--timewarp',
             '--windowslice', '--windowwarp', '--rotation']

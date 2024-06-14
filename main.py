@@ -12,6 +12,7 @@ Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
 import os
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -101,10 +102,10 @@ if __name__ == '__main__':
     # Calculate iterations and epochs
     nb_iterations = args.iterations
     batch_size = args.batch_size
-    nb_epochs = int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
+    nb_epochs = 10  # int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
     print(f'epoch: {nb_epochs}')
 
-    # Assume `mod.get_model` returns a PyTorch model
+    # `mod.get_model` returns a PyTorch model
     model = mod.get_model(args.model, input_shape, nb_class).to(device)
 
     # Wrap the model using DataParallel to use multiple GPUs if available
