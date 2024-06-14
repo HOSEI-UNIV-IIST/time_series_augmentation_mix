@@ -48,11 +48,13 @@ if [[ -z "$datasets" ]]; then
 fi
 
 # Define the augmentation techniques directly in the bash file
-aug_tech=('--original' '--jitter' '--scaling'  '--rotation' '--permutation' '--randompermutation' '--magwarp' '--timewarp' '--windowslice' '--windowwarp')
+aug_tech=('--original' '--jitter' '--scaling' '--rotation' '--permutation' '--randompermutation' '--magwarp' '--timewarp' '--windowslice' '--windowwarp')
 
 # Loop over each dataset and augmentation technique and run the Python script
-for dataset in $datasets; do
-    for aug in "${aug_tech[@]}"; do
-        python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=1 --model=fcnn
-    done
+for ratio in $(seq 1 4); do
+  for dataset in $datasets; do
+      for aug in "${aug_tech[@]}"; do
+          python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=$ratio --model=fcnn
+      done
+  done
 done
