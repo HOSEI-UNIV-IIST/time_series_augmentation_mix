@@ -1,6 +1,6 @@
 # Time Series Augmentation
 
-This is a collection of time series data augmentation methods and an example use using Keras.
+This is a collection of time series data augmentation methods and an example use using PyTorch.
 
 ## News
 
@@ -8,7 +8,7 @@ This is a collection of time series data augmentation methods and an example use
 
 ## Requires
 
-This code was developed in Python 3.11.0. and requires Tensorflow 2.13.1 and Keras 2.13.1
+This code was developed in Python 3.11.0. and requires PyTorch 2.x.x
 
 ### Normal Install
 

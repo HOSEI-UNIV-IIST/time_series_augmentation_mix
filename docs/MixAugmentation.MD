@@ -133,3 +133,5 @@ def augment_data(x, y, method='sequential', num_augmentations=3):
 | Strawberry      | Spectro   | 613   | 370  | 2     | 235    |
 | Yoga            | Image     | 300   | 3000 | 2     | 426    |
 
+
+

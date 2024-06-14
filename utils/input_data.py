@@ -70,7 +70,7 @@ def run_augmentation(x, y, args):
     if args.augmentation_ratio > 0:
         augmentation_tags = "%d"%args.augmentation_ratio
         for n in range(args.augmentation_ratio):
-            x_temp, augmentation_tags = augment(x, y, args)
+            x_temp, augmentation_tags = augment(x, args)
             x_aug = np.append(x_aug, x_temp, axis=0)
             y_aug = np.append(y_aug, y, axis=0)
             print("Round %d: %s done"%(n, augmentation_tags))
@@ -80,52 +80,34 @@ def run_augmentation(x, y, args):
         augmentation_tags = args.extra_tag
     return x_aug, y_aug, augmentation_tags
 
-def augment(x, y, args):
+def augment(x, args):
     import utils.augmentation as aug
     augmentation_tags = ""
     if args.jitter==True:
         x = aug.jitter(x)
         augmentation_tags += "_jitter"
-    if args.scaling==True:
+    elif args.scaling==True:
         x = aug.scaling(x)
         augmentation_tags += "_scaling"
-    if args.rotation==True:
+    elif args.rotation==True:
         x = aug.rotation(x)
         augmentation_tags += "_rotation"
-    if args.permutation==True:
+    elif args.permutation==True:
         x = aug.permutation(x)
         augmentation_tags += "_permutation"
-    if args.randompermutation==True:
+    elif args.randompermutation==True:
         x = aug.permutation(x, seg_mode="random")
         augmentation_tags += "_randomperm"
-    if args.magwarp==True:
+    elif args.magwarp==True:
         x = aug.magnitude_warp(x)
         augmentation_tags += "_magwarp"
-    if args.timewarp==True:
+    elif args.timewarp==True:
         x = aug.time_warp(x)
         augmentation_tags += "_timewarp"
-    if args.windowslice==True:
+    elif args.windowslice==True:
         x = aug.window_slice(x)
         augmentation_tags += "_windowslice"
-    if args.windowwarp==True:
+    elif args.windowwarp==True:
         x = aug.window_warp(x)
         augmentation_tags += "_windowwarp"
-    if args.spawner==True:
-        x = aug.spawner(x, y)
-        augmentation_tags += "_spawner"
-    if args.dtwwarp==True:
-        x = aug.random_guided_warp(x, y)
-        augmentation_tags += "_rgw"
-    if args.shapedtwwarp==True:
-        x = aug.random_guided_warp_shape(x, y)
-        augmentation_tags += "_rgws"
-    if args.wdba==True:
-        x = aug.wdba(x, y)
-        augmentation_tags += "_wdba"
-    if args.discdtw==True:
-        x = aug.discriminative_guided_warp(x, y)
-        augmentation_tags += "_dgw"
-    if args.discsdtw==True:
-        x = aug.discriminative_guided_warp_shape(x, y)
-        augmentation_tags += "_dgws"
     return x, augmentation_tags
