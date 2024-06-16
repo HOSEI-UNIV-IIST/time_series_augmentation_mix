@@ -102,7 +102,7 @@ if __name__ == '__main__':
     # Calculate iterations and epochs
     nb_iterations = args.iterations
     batch_size = args.batch_size
-    nb_epochs = 10  # int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
+    nb_epochs = int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
     print(f'epoch: {nb_epochs}')
 
     # `mod.get_model` returns a PyTorch model
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     # Early stopping parameters
     best_val_loss = float('inf')
-    early_stopping_patience = 10
+    early_stopping_patience = 200
     epochs_no_improve = 0
 
     # Training loop
@@ -222,7 +222,8 @@ if __name__ == '__main__':
             val_losses.append(val_loss)
             val_accuracies.append(val_accuracy)
 
-            print(f'Epoch {epoch + 1}/{nb_epochs}, Train Loss: {epoch_loss:.4f}, Train Accuracy: {epoch_accuracy:.4f}, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}')
+            print(
+                f'Epoch {epoch + 1}/{nb_epochs}, Train Loss: {epoch_loss:.4f}, Train Accuracy: {epoch_accuracy:.4f}, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}')
 
             # Log the loss and adjust learning rate if needed
             reduce_lr.step(val_loss)

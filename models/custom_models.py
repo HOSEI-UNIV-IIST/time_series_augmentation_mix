@@ -38,7 +38,7 @@ class VGG(nn.Module):
         print("Pooling layers:", nb_cnn)
 
         layers = []
-        in_channels = input_shape[1]  # Assuming input_shape is (timesteps, features)
+        in_channels = input_shape[1]  # input_shape mus be is (timesteps, features)
 
         for i in range(nb_cnn):
             num_filters = min(64 * 2 ** i, 512)

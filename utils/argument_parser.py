@@ -11,8 +11,8 @@ Univ: Hosei University
 Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
-import argparse
 
+import argparse
 
 def argument_parser():
     global args
@@ -69,13 +69,13 @@ def argument_parser():
     parser.add_argument('--weight_dir', type=str, default="weights", help="Weight path")
     parser.add_argument('--log_dir', type=str, default="logs", help="Log path")
     parser.add_argument('--output_dir', type=str, default="output", help="Output path")
-    parser.add_argument('--normalize_input', default=False, action="store_true", help="Normalize between [-1,1]")
+    parser.add_argument('--normalize_input', default=True, action="store_true", help="Normalize between [-1,1]")
     parser.add_argument('--delimiter', type=str, default=" ", help="Delimiter")
     # Network settings
-    parser.add_argument('--optimizer', type=str, default="sgd", help="Which optimizer")
+    parser.add_argument('--optimizer', type=str, default="adam", help="Which optimizer")
     parser.add_argument('--lr', type=float, default=1e-3, help="Learning Rate")
     parser.add_argument('--validation_split', type=int, default=0, help="Size of validation set")
-    parser.add_argument('--iterations', type=int, default=1000, help="Number of iterations")
+    parser.add_argument('--iterations', type=int, default=10000, help="Number of iterations")
     parser.add_argument('--batch_size', type=int, default=256, help="Batch size")
     parser.add_argument('--verbose', type=int, default=2, help="Verbose")
     args = parser.parse_args()
