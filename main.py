@@ -22,11 +22,11 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, TensorDataset
 from torch.utils.tensorboard import SummaryWriter
 
-import models.custom_models as mod
 import utils.datasets as ds
+from models import custom_models as mod, mix_augmentation as aug
 from utils.argument_parser import argument_parser
 from utils.cache_loss_accuracy import CacheLossAccuracy
-from utils.input_data import get_datasets, run_augmentation
+from utils.input_data import get_datasets
 from utils.save_result import save_accuracy
 
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     if args.original:
         augmentation_tags = '_original'
     else:
-        x_train, y_train, augmentation_tags = run_augmentation(x_train.numpy(), y_train.numpy(), args)
+        x_train, y_train, augmentation_tags = aug.run_augmentation(x_train.numpy(), y_train.numpy(), args)
         print(f"x_train shape after augmentation: {x_train.shape}, y_train shape after augmentation: {y_train.shape}")
 
     # Convert augmented data to tensors
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     # Calculate iterations and epochs
     nb_iterations = args.iterations
     batch_size = args.batch_size
-    nb_epochs = int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
+    nb_epochs = 10  # int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
     print(f'epoch: {nb_epochs}')
 
     # `mod.get_model` returns a PyTorch model

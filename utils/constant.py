@@ -13,13 +13,13 @@ Lab: Prof YU Keping's Lab
 """
 
 ucr_data = [
-    "ECG200",
+    #"ECG200",
     "ECG5000",
-    "FordB",
-    "GunPointAgeSpan",
-    "ScreenType",
-    "Strawberry",
-    "Yoga",
+    #"FordB",
+    #"GunPointAgeSpan",
+    #"ScreenType",
+    #"Strawberry",
+    #"Yoga",
 ]
 
 aug_tech = ['--original', '--jitter', '--scaling',
