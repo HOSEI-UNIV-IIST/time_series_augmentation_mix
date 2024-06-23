@@ -74,10 +74,10 @@ for dataset in $datasets; do
   for aug in "${aug_tech_mix[@]}"; do
     if [[ "$aug" == "sequential_magnitude1" || "$aug" == "sequential_magnitude2" || "$aug" == "sequential_magnitude4" ]]; then
       for ratio in 1; do
-        python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
+        python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=lstm1
       done
     else
-      python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=1 --optimizer=adam --model=fcnn
+      python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=1 --optimizer=adam --model=lstm1
     fi
   done
 done

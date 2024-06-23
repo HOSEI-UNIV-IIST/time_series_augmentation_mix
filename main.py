@@ -102,7 +102,7 @@ if __name__ == '__main__':
     # Calculate iterations and epochs
     nb_iterations = args.iterations
     batch_size = args.batch_size
-    nb_epochs = 10  # int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
+    nb_epochs = int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
     print(f'epoch: {nb_epochs}')
 
     # `mod.get_model` returns a PyTorch model
@@ -261,19 +261,19 @@ if __name__ == '__main__':
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
     accur = f'{(100 * correct) / total:.2f}%'
-    file_name = f'{args.dataset}_accuracies.json'
+    file_name = f'{args.augmentation_ratio}_{args.dataset}_accuracies.json'
     print(f'Best Train Accuracy: {accur}')
     save_accuracy(accur, f'{args.dataset}{augmentation_tags}', output_dir, file_name)
 
     # Save predictions
-    if args.save:
-        y_preds = []
-        with torch.no_grad():
-            for data, labels in test_loader:
-                data = data.to(device)
-                outputs = model(data)
-                _, predicted = torch.max(outputs.data, 1)
-                y_preds.extend(predicted.cpu().numpy())
-        y_preds = np.array(y_preds)
-        out = f'{(100 * correct) / total:.2f}%'
-        np.savetxt(os.path.join(output_dir, f"{out}.txt"), y_preds, fmt="%d")
+    # if args.save:
+    #     y_preds = []
+    #     with torch.no_grad():
+    #         for data, labels in test_loader:
+    #             data = data.to(device)
+    #             outputs = model(data)
+    #             _, predicted = torch.max(outputs.data, 1)
+    #             y_preds.extend(predicted.cpu().numpy())
+    #     y_preds = np.array(y_preds)
+    #     out = f'{(100 * correct) / total:.2f}%'
+    #     np.savetxt(os.path.join(output_dir, f"{out}.txt"), y_preds, fmt="%d")

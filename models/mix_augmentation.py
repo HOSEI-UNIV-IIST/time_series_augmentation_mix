@@ -11,9 +11,10 @@ Univ: Hosei University
 Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
+import re
 
 import numpy as np
-import re
+
 
 def run_augmentation(x, y, args):
     print("Augmenting %s" % args.dataset)
@@ -56,6 +57,7 @@ def run_augmentation(x, y, args):
 
     return x_aug, y_aug, augmentation_tags
 
+
 def augment_data_simple(x, args):
     import utils.augmentation as aug
     augmentation_tags = ""
@@ -90,28 +92,24 @@ def augment_data_simple(x, args):
 
 
 def augment_sequential(x, y, args):
+    method_num = re.search(r'\d+', args.augmentation_method).group()
     if 'sequential_magnitude' in args.augmentation_method:
-        method_num = args.augmentation_method[-1]
         return globals()[f'augment_data_sequential_magnitude{method_num}'](x, y)
     elif 'sequential_time' in args.augmentation_method:
-        method_num = args.augmentation_method[-1]
         return globals()[f'augment_data_sequential_time{method_num}'](x, y)
     elif 'sequential_combined' in args.augmentation_method:
-        method_num = args.augmentation_method[-1]
         return globals()[f'augment_data_sequential_combined{method_num}'](x, y)
     else:
         raise ValueError("Unknown sequential augmentation method")
 
 
 def augment_parallel(x, y, args):
+    method_num = re.search(r'\d+', args.augmentation_method).group()
     if 'parallel_magnitude' in args.augmentation_method:
-        method_num = args.augmentation_method[-1]
         return globals()[f'augment_data_parallel_magnitude{method_num}'](x, y)
     elif 'parallel_time' in args.augmentation_method:
-        method_num = args.augmentation_method[-1]
         return globals()[f'augment_data_parallel_time{method_num}'](x, y)
     elif 'parallel_combined' in args.augmentation_method:
-        method_num = args.augmentation_method[-1]
         return globals()[f'augment_data_parallel_combined{method_num}'](x, y)
     else:
         raise ValueError("Unknown parallel augmentation method")
@@ -406,55 +404,7 @@ def augment_data_parallel_magnitude8(x, y):
     return x_combined, y_combined, augmentation_tags
 
 
-def augment_data_parallel_magnitude1(x, y):
-    import utils.augmentation as aug
-    x_combined = []
-    y_combined = []
-
-    for _ in range(4):
-        x_aug = aug.permutation(x.copy())
-        x_combined.append(x_aug)
-        y_combined.append(y)
-
-    x_combined = np.concatenate(x_combined)
-    y_combined = np.concatenate(y_combined)
-    augmentation_tags = "_augment_data_parallel_magnitude1"
-    return x_combined, y_combined, augmentation_tags
-
-
-def augment_data_parallel_magnitude2(x, y):
-    import utils.augmentation as aug
-    x_combined = []
-    y_combined = []
-
-    for _ in range(4):
-        x_aug = aug.time_warp(x.copy())
-        x_combined.append(x_aug)
-        y_combined.append(y)
-
-    x_combined = np.concatenate(x_combined)
-    y_combined = np.concatenate(y_combined)
-    augmentation_tags = "_augment_data_parallel_magnitude2"
-    return x_combined, y_combined, augmentation_tags
-
-
-def augment_data_parallel_magnitude3(x, y):
-    import utils.augmentation as aug
-    x_combined = []
-    y_combined = []
-
-    for _ in range(4):
-        x_aug = aug.window_warp(x.copy())
-        x_combined.append(x_aug)
-        y_combined.append(y)
-
-    x_combined = np.concatenate(x_combined)
-    y_combined = np.concatenate(y_combined)
-    augmentation_tags = "_augment_data_parallel_magnitude3"
-    return x_combined, y_combined, augmentation_tags
-
-
-def augment_data_parallel_magnitude4(x, y):
+def augment_data_parallel_time1(x, y):
     import utils.augmentation as aug
     x_combined = []
     y_combined = []
@@ -466,9 +416,56 @@ def augment_data_parallel_magnitude4(x, y):
 
     x_combined = np.concatenate(x_combined)
     y_combined = np.concatenate(y_combined)
-    augmentation_tags = "_augment_data_parallel_magnitude4"
+    augmentation_tags = "_augment_data_parallel_time1"
     return x_combined, y_combined, augmentation_tags
 
+
+def augment_data_parallel_time2(x, y):
+    import utils.augmentation as aug
+    x_combined = []
+    y_combined = []
+
+    for _ in range(4):
+        x_aug = aug.permutation(x.copy())
+        x_combined.append(x_aug)
+        y_combined.append(y)
+
+    x_combined = np.concatenate(x_combined)
+    y_combined = np.concatenate(y_combined)
+    augmentation_tags = "_augment_data_parallel_time2"
+    return x_combined, y_combined, augmentation_tags
+
+
+def augment_data_parallel_time3(x, y):
+    import utils.augmentation as aug
+    x_combined = []
+    y_combined = []
+
+    for _ in range(4):
+        x_aug = aug.time_warp(x.copy())
+        x_combined.append(x_aug)
+        y_combined.append(y)
+
+    x_combined = np.concatenate(x_combined)
+    y_combined = np.concatenate(y_combined)
+    augmentation_tags = "_augment_data_parallel_time3"
+    return x_combined, y_combined, augmentation_tags
+
+
+def augment_data_parallel_time4(x, y):
+    import utils.augmentation as aug
+    x_combined = []
+    y_combined = []
+
+    for _ in range(4):
+        x_aug = aug.window_warp(x.copy())
+        x_combined.append(x_aug)
+        y_combined.append(y)
+
+    x_combined = np.concatenate(x_combined)
+    y_combined = np.concatenate(y_combined)
+    augmentation_tags = "_augment_data_parallel_time4"
+    return x_combined, y_combined, augmentation_tags
 
 def augment_data_parallel_time5(x, y):
     import utils.augmentation as aug
