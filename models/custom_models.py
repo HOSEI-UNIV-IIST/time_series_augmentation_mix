@@ -247,3 +247,51 @@ class ResNet(nn.Module):
         # Fully Connected Layer
         x = self.fc(x)
         return F.softmax(x, dim=1)
+
+
+class LSTMFCN(nn.Module):
+    def __init__(self, input_shape, nb_class):
+        super(LSTMFCN, self).__init__()
+        self.in_channels = input_shape[1]  # input_shape is (timesteps, features)
+
+        # LSTM part
+        self.lstm = nn.LSTM(input_shape[1], 128, batch_first=True)
+        self.dropout = nn.Dropout(0.8)
+
+        # Fully Convolutional Network part
+        self.conv1 = nn.Conv1d(input_shape[1], 128, kernel_size=8, padding=4)
+        self.bn1 = nn.BatchNorm1d(128)
+        self.conv2 = nn.Conv1d(128, 256, kernel_size=5, padding=2)
+        self.bn2 = nn.BatchNorm1d(256)
+        self.conv3 = nn.Conv1d(256, 128, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm1d(128)
+
+        # Global Average Pooling
+        self.gap = nn.AdaptiveAvgPool1d(1)
+
+        # Fully Connected Layer
+        self.fc = nn.Linear(256, nb_class)  # 128 from LSTM + 128 from GAP
+
+    def forward(self, x):
+        # x shape: (batch_size, timesteps, features)
+
+        # LSTM part
+        lstm_out, (hn, cn) = self.lstm(x)  # lstm_out shape: (batch_size, timesteps, 128)
+        lstm_out = lstm_out[:, -1, :]  # Taking the output of the last time step
+        lstm_out = self.dropout(lstm_out)
+
+        # FCN part
+        x = x.permute(0, 2, 1)  # Change to (batch_size, features, timesteps)
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        x = self.gap(x)
+        x = x.squeeze(-1)  # Remove last dimension
+
+        # Concatenate LSTM output and FCN output
+        x = torch.cat((lstm_out, x), dim=1)
+
+        # Fully Connected Layer
+        x = self.fc(x)
+        return F.softmax(x, dim=1)
+

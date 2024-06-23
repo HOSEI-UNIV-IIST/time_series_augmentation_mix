@@ -11,6 +11,7 @@ Univ: Hosei University
 Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
+
 import os
 
 import numpy as np
@@ -163,8 +164,6 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # Lists to store loss and accuracy values
-    train_losses = []
-    train_accuracies = []
     val_losses = []
     val_accuracies = []
 
@@ -197,9 +196,6 @@ if __name__ == '__main__':
 
             epoch_loss /= len(train_loader)
             epoch_accuracy = epoch_correct / epoch_total
-
-            train_losses.append(epoch_loss)
-            train_accuracies.append(epoch_accuracy)
 
             # Validation phase
             model.eval()
@@ -242,7 +238,7 @@ if __name__ == '__main__':
 
         if args.save:
             torch.save(model.state_dict(), os.path.join(weight_dir, f"{model_prefix}_final_weights.pth"))
-            cache = CacheLossAccuracy(train_losses, train_accuracies, output_dir, model_prefix)
+            cache = CacheLossAccuracy(val_losses, val_accuracies, output_dir, model_prefix)
             cache.save_training_data()
             cache.plot_training_data()
 
@@ -264,6 +260,7 @@ if __name__ == '__main__':
     file_name = f'{args.augmentation_ratio}_{args.dataset}_accuracies.json'
     print(f'Best Train Accuracy: {accur}')
     save_accuracy(accur, f'{args.dataset}{augmentation_tags}', output_dir, file_name)
+
 
     # Save predictions
     # if args.save:
