@@ -22,11 +22,11 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, TensorDataset
 from torch.utils.tensorboard import SummaryWriter
 
-import models.custom_models as mod
+from models import custom_models as mod, augmentation as aug
 import utils.datasets as ds
 from utils.argument_parser import argument_parser
 from utils.cache_loss_accuracy import CacheLossAccuracy
-from utils.input_data import get_datasets, run_augmentation
+from utils.input_data import get_datasets
 from utils.save_result import save_accuracy
 
 
@@ -44,7 +44,10 @@ def wrap_model_with_dataparallel(model, device, gpus):
     """
     if torch.cuda.is_available():
         assert torch.cuda.device_count() >= gpus, f"Not enough GPUs available. Required: {gpus}, Available: {torch.cuda.device_count()}"
-        gpu_ids = [i for i in range(gpus)]
+        if gpus>0:
+            gpu_ids = [i for i in range(gpus)]
+        else:
+            gpu_ids = [0]
         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, gpu_ids))
         model = nn.DataParallel(model, device_ids=gpu_ids)
     return model.to(device)
@@ -88,7 +91,7 @@ if __name__ == '__main__':
     if args.original:
         augmentation_tags = '_original'
     else:
-        x_train, y_train, augmentation_tags = run_augmentation(x_train.numpy(), y_train.numpy(), args)
+        x_train, y_train, augmentation_tags = aug.run_augmentation(x_train.numpy(), y_train.numpy(), args)
         print(f"x_train shape after augmentation: {x_train.shape}, y_train shape after augmentation: {y_train.shape}")
 
     # Convert augmented data to tensors
@@ -170,7 +173,7 @@ if __name__ == '__main__':
 
     # Early stopping parameters
     best_val_loss = float('inf')
-    early_stopping_patience = 200
+    early_stopping_patience = 1000
     epochs_no_improve = 0
 
     # Training loop
@@ -180,7 +183,7 @@ if __name__ == '__main__':
             epoch_loss = 0.0
             epoch_correct = 0
             epoch_total = 0
-
+            '''
             for data, labels in train_loader:
                 data, labels = data.to(device), labels.to(device)
                 optimizer.zero_grad()
@@ -200,7 +203,7 @@ if __name__ == '__main__':
 
             train_losses.append(epoch_loss)
             train_accuracies.append(epoch_accuracy)
-
+            '''
             # Validation phase
             model.eval()
             val_loss = 0.0
@@ -223,7 +226,7 @@ if __name__ == '__main__':
             val_accuracies.append(val_accuracy)
 
             print(
-                f'Epoch {epoch + 1}/{nb_epochs}, Train Loss: {epoch_loss:.4f}, Train Accuracy: {epoch_accuracy:.4f}, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}')
+                f'Epoch {epoch + 1}/{nb_epochs}, Train Loss: {epoch_loss:.4f},  Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}')
 
             # Log the loss and adjust learning rate if needed
             reduce_lr.step(val_loss)

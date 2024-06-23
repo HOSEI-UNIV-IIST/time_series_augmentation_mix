@@ -20,16 +20,89 @@ import torch.nn.functional as F
 
 
 def get_model(model_name, input_shape, nb_class):
-    if model_name == "vgg":
+    if model_name == "lstm1":
+        model = SimpleLSTM1(input_shape, nb_class)
+    elif model_name == "gru1":
+        model = SimpleGRU1(input_shape, nb_class)
+    elif model_name == "lstm2":
+        model = SimpleLSTM2(input_shape, nb_class)
+    elif model_name == "gru2":
+        model = SimpleGRU2(input_shape, nb_class)
+    elif model_name == "vgg":
         model = VGG(input_shape, nb_class)
     elif model_name == "fcnn":
         model = FCNN(input_shape, nb_class)
     elif model_name == "resnet":
         model = ResNet(input_shape, nb_class)
+    elif model_name == "lfcn":
+        model = LSTMFCN(input_shape, nb_class)
     else:
         raise ValueError(f"Model {model_name} not found")
     return model
 
+
+class SimpleLSTM1(nn.Module):
+    def __init__(self, input_shape, nb_class):
+        super(SimpleLSTM1, self).__init__()
+        self.nb_dims = input_shape[1]
+        self.lstm = nn.LSTM(self.nb_dims, 100, batch_first=True)
+        self.fc = nn.Linear(100, nb_class)
+
+    def forward(self, x):
+        # x shape: (batch, nb_timesteps, nb_dims)
+        out, (hn, cn) = self.lstm(x)  # LSTM output
+        out = out[:, -1, :]  # Take the output of the last timestep
+        out = self.fc(out)  # Pass through a linear layer
+        return torch.softmax(out, dim=1)  # Softmax to get probabilities
+
+
+class SimpleGRU1(nn.Module):
+    def __init__(self, input_shape, nb_class):
+        super(SimpleGRU1, self).__init__()
+        self.nb_dims = input_shape[1]
+        self.gru = nn.GRU(self.nb_dims, 100, batch_first=True)
+        self.fc = nn.Linear(100, nb_class)
+
+    def forward(self, x):
+        # x shape: (batch, nb_timesteps, nb_dims)
+        out, hn = self.gru(x)  # GRU output
+        out = out[:, -1, :]  # Take the output of the last timestep
+        out = self.fc(out)  # Pass through a linear layer
+        return out
+
+
+class SimpleLSTM2(nn.Module):
+    def __init__(self, input_shape, nb_class):
+        super(SimpleLSTM2, self).__init__()
+        self.nb_dims = input_shape[1]
+        self.lstm1 = nn.LSTM(self.nb_dims, 100, batch_first=True)
+        self.lstm2 = nn.LSTM(100, 100, batch_first=True)
+        self.fc = nn.Linear(100, nb_class)
+
+    def forward(self, x):
+        # Xshape: (batch, nb_timesteps, nb_dims)
+        out, (hn, cn) = self.lstm1(x)  # First LSTM layer
+        out, (hn, cn) = self.lstm2(out)  # Second LSTM layer
+        out = out[:, -1, :]  # take the output of the last timestep
+        out = self.fc(out)  # Pass through a linear layer
+        return torch.softmax(out, dim=1)  # Softmax to get probabilities
+
+
+class SimpleGRU2(nn.Module):
+    def __init__(self, input_shape, nb_class):
+        super(SimpleGRU2, self).__init__()
+        self.nb_dims = input_shape[1]
+        self.gru1 = nn.GRU(self.nb_dims, 100, batch_first=True)
+        self.gru2 = nn.GRU(100, 100, batch_first=True)
+        self.fc = nn.Linear(100, nb_class)
+
+    def forward(self, x):
+        # x shape: (batch, nb_timesteps, nb_dims)
+        out, _ = self.gru1(x)  # First GRU layer
+        out, _ = self.gru2(out)  # Second GRU layer
+        out = out[:, -1, :]  # Take the output of the last timestep
+        out = self.fc(out)  # Pass through a linear layer
+        return torch.softmax(out, dim=1)  # Softmax to get probabilities
 
 class VGG(nn.Module):
     def __init__(self, input_shape, nb_class):
@@ -174,3 +247,44 @@ class ResNet(nn.Module):
         # Fully Connected Layer
         x = self.fc(x)
         return F.softmax(x, dim=1)
+
+
+class LSTMFCN(nn.Module):
+    def __init__(self, input_shape, nb_class):
+        super(LSTMFCN, self).__init__()
+        self.nb_timesteps = input_shape[0]
+        self.nb_dims = input_shape[1]
+
+        self.lstm = nn.LSTM(self.nb_dims, 128, batch_first=True)
+        self.dropout = nn.Dropout(0.8)
+
+        self.conv1 = nn.Conv1d(self.nb_dims, 128, kernel_size=8, padding=4)  # padding=4 for 'same' padding
+        self.bn1 = nn.BatchNorm1d(128)
+        self.conv2 = nn.Conv1d(128, 256, kernel_size=5, padding=2)  # padding=2 for 'same' padding
+        self.bn2 = nn.BatchNorm1d(256)
+        self.conv3 = nn.Conv1d(256, 128, kernel_size=3, padding=1)  # padding=1 for 'same' padding
+        self.bn3 = nn.BatchNorm1d(128)
+        self.global_avg_pool = nn.AdaptiveAvgPool1d(1)
+
+        self.fc = nn.Linear(128 + 128, nb_class)
+
+    def forward(self, x):
+        # LSTM part
+        lstm_out, _ = self.lstm(x)  # x shape: (batch, timesteps, features)
+        lstm_out = lstm_out[:, -1, :]  # Take the output of the last timestep
+        lstm_out = self.dropout(lstm_out)
+
+        # Convolutional part
+        x_permuted = x.permute(0, 2, 1)  # Permute to shape: (batch, features, timesteps)
+        conv_out = F.relu(self.bn1(self.conv1(x_permuted)))
+        conv_out = F.relu(self.bn2(self.conv2(conv_out)))
+        conv_out = F.relu(self.bn3(self.conv3(conv_out)))
+        conv_out = self.global_avg_pool(conv_out)
+        conv_out = conv_out.squeeze(-1)  # Remove last dimension
+
+        # Concatenate LSTM and convolutional outputs
+        combined_out = torch.cat((lstm_out, conv_out), dim=1)
+
+        # Fully connected layer
+        out = self.fc(combined_out)
+        return torch.softmax(out, dim=1)

@@ -50,7 +50,7 @@ def train(model, device, train_loader, optimizer, criterion, epochs=5):
 
 def main():
     # Set device
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu_old')
     print(f'Using device: {device}')
 
     # Hyperparameters

@@ -52,22 +52,19 @@ aug_tech_mix=('sequential_magnitude1' 'sequential_magnitude2' 'sequential_magnit
               'sequential_magnitude4' 'sequential_time1' 'sequential_time2' 'sequential_time3'
               'sequential_time4' 'sequential_time5' 'parallel_magnitude1' 'parallel_magnitude2'
               'parallel_magnitude3' 'parallel_magnitude4' 'parallel_time1' 'parallel_time2'
-              'parallel_time3' 'parallel_time4' 'parallel_time5' 'sequential_combined1'
-              'sequential_combined2' 'sequential_combined3' 'sequential_combined4'
-              'sequential_combined5' 'sequential_combined6' 'sequential_combined7'
-              'sequential_combined8' 'sequential_combined9' 'sequential_combined10'
-              'sequential_combined20' 'parallel_combined1' 'parallel_combined2'
-              'parallel_combined3' 'parallel_combined4' 'parallel_combined5')
+              'parallel_time3' 'parallel_time4' 'parallel_time5'
+              #'sequential_combined1' 'sequential_combined2' 'sequential_combined3' 'sequential_combined4'
+              #'sequential_combined5' 'sequential_combined6' 'sequential_combined7'
+              #'sequential_combined8' 'sequential_combined9' 'sequential_combined10'
+              #'parallel_combined1' 'parallel_combined2' 'parallel_combined3'
+              #'parallel_combined4' 'parallel_combined5'
+              )
 
 # Loop over each dataset and augmentation technique and run the Python script
-for dataset in $datasets; do
-  for aug in "${aug_tech_mix[@]}"; do
-    if [[ "$aug" == "sequential_magnitude1" || "$aug" == "sequential_magnitude2" || "$aug" == "sequential_magnitude4" ]]; then
-      for ratio in 1 2 4; do
-        python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
+for ratio in $(seq 1 2); do
+  for dataset in $datasets; do
+      for aug in "${aug_tech_mix[@]}"; do
+          python3 main.py --gpus=0 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=Adam --model=fcnn
       done
-    else
-      python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=1 --optimizer=adam --model=fcnn
-    fi
   done
 done

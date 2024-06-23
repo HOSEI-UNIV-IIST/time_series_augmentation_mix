@@ -54,7 +54,8 @@ aug_tech=('--original' '--jitter' '--scaling' '--rotation' '--permutation' '--ra
 for ratio in $(seq 1 4); do
   for dataset in $datasets; do
       for aug in "${aug_tech[@]}"; do
-          python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=$ratio --model=fcnn
+          #python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=$ratio --optimizer=adam --augmentation_method="simple" --model=fcnn
+          python3 main.py --gpus=0 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=$ratio --optimizer=adam --augmentation_method="simple" --model=lstm1
       done
   done
 done
