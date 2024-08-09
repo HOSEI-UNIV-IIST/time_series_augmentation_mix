@@ -14,7 +14,8 @@ Lab: Prof YU Keping's Lab
 import re
 
 import numpy as np
-
+import re
+import numpy as np
 
 def run_augmentation(x, y, args):
     print("Augmenting %s" % args.dataset)
@@ -22,10 +23,11 @@ def run_augmentation(x, y, args):
     x_aug = x
     y_aug = y
     augmentation_tags = args.extra_tag
+    ratio = args.augmentation_ratio * 4 if 'sequential' in args.augmentation_method else args.augmentation_ratio
 
-    if args.augmentation_ratio > 0:
-        augmentation_tags = "%d" % args.augmentation_ratio
-        for n in range(args.augmentation_ratio):
+    if ratio > 0:
+        initial_tags = "%d" % args.augmentation_ratio
+        for n in range(ratio):
             if 'sequential' in args.augmentation_method:
                 # For sequential methods, use the updated data from the previous round
                 x_temp, y_temp, temp_tags = augment_sequential(x_aug, y_aug, args)
@@ -49,14 +51,14 @@ def run_augmentation(x, y, args):
             y_aug = np.append(y_aug, y_temp, axis=0)
             print("Round %d: %s done" % (n, augmentation_tags + temp_tags))
 
-        augmentation_tags += temp_tags
         if args.extra_tag:
-            augmentation_tags += "_" + args.extra_tag
+            augmentation_tags = f"{initial_tags}_{args.extra_tag}_{temp_tags}"
+        else:
+            augmentation_tags = f"{initial_tags}{temp_tags}"
     else:
         augmentation_tags = args.extra_tag
 
     return x_aug, y_aug, augmentation_tags
-
 
 def augment_data_simple(x, args):
     import utils.augmentation as aug
@@ -90,7 +92,6 @@ def augment_data_simple(x, args):
         augmentation_tags += "_windowwarp"
     return x, augmentation_tags
 
-
 def augment_sequential(x, y, args):
     method_num = re.search(r'\d+', args.augmentation_method).group()
     if 'sequential_magnitude' in args.augmentation_method:
@@ -101,7 +102,6 @@ def augment_sequential(x, y, args):
         return globals()[f'augment_data_sequential_combined{method_num}'](x, y)
     else:
         raise ValueError("Unknown sequential augmentation method")
-
 
 def augment_parallel(x, y, args):
     method_num = re.search(r'\d+', args.augmentation_method).group()

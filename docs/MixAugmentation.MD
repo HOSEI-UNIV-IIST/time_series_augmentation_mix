@@ -103,10 +103,9 @@ def augment_data(x, y, method='sequential', num_augmentations=3):
 | Magnitude         | Time               |
 |-------------------|--------------------|
 | Jittering         | Permutation        |
-| Rotation          | Slicing            |
+| Rotation          | Window Slicing     |
 | Scaling           | Time Warping       |
 | Magnitude Warping | Window Warping     |
-|                   | Window Slicing     |
 
 - Pattern-Based: Not used
 

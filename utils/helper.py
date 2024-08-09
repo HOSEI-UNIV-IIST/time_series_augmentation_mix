@@ -1,4 +1,8 @@
+import os
+
 import numpy as np
+import plotly.graph_objs as go
+
 
 def plot2d(x, y, x2=None, y2=None, x3=None, y3=None, xlim=(-1, 1), ylim=(-1, 1), save_file=""):
     import matplotlib.pyplot as plt
@@ -35,4 +39,94 @@ def plot1d(x, x2=None, x3=None, ylim=(-1, 1), save_file=""):
         plt.savefig(save_file, "")
     else:
         plt.show()
+    return
+
+
+def save_x_train(x_train, name, extension="npy"):
+    # Ensure the 'data' directory exists
+    os.makedirs('./data', exist_ok=True)
+
+    # Determine the file path
+    file_path = os.path.join('./data', f"{name}_train.{extension}")
+
+    # Save the file in the desired format
+    if extension == "npy":
+        np.save(file_path, x_train)
+    elif extension == "csv":
+        # Reshape for saving in CSV
+        reshaped_x_train = x_train.reshape(x_train.shape[0], -1)
+        np.savetxt(file_path, reshaped_x_train, delimiter=",")
+    else:
+        raise ValueError("Unsupported file extension. Use 'npy' or 'csv'.")
+
+    print(f"x_train saved to {file_path}")
+
+
+def load_x_train(name, extension="npy"):
+    # Determine the file path
+    file_path = os.path.join('./data', f"{name}_train.{extension}")
+
+    # Load the file based on the extension
+    if extension == "npy":
+        x_train = np.load(file_path)
+    elif extension == "csv":
+        x_train = np.loadtxt(file_path, delimiter=",")
+    else:
+        raise ValueError("Unsupported file extension. Use 'npy' or 'csv'.")
+
+    print(f"x_train loaded from {file_path}")
+    return x_train
+
+
+import plotly.graph_objs as go
+import numpy as np
+import os
+
+def plot1d_plotly(x, x2=None, x3=None, label1='original', label2='x2', label3='x3', ylim=(-1, 1), save_file=''):
+    # Create steps for x-axis
+    steps = np.arange(x.shape[0])
+
+    # Create the plot using Plotly
+    fig = go.Figure()
+
+    # Add the first trace with its label
+    fig.add_trace(go.Scatter(x=steps, y=x, mode='lines', name=label1))
+
+    # Add the second trace with its legend (labeled as "label2 transformation")
+    if x2 is not None:
+        fig.add_trace(go.Scatter(x=steps, y=x2, mode='lines', name=label2))
+
+    # Add the third trace with its label
+    if x3 is not None:
+        fig.add_trace(go.Scatter(x=steps, y=x3, mode='lines', name=label3))
+
+    # Update layout with the legend at the bottom
+    fig.update_layout(
+        xaxis=dict(range=[0, x.shape[0]]),
+        yaxis=dict(range=ylim),
+        width=600,  # Increased width for higher resolution
+        height=300,  # Increased height for higher resolution
+        margin=dict(l=40, r=40, t=40, b=100),  # Adjusted bottom margin for legend
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,  # Adjust this to move the legend below the plot
+            xanchor="center",
+            x=0.5,
+            font=dict(color="black"),
+        ),
+    )
+
+    # Save or show the figure
+    if save_file:
+        # Ensure the 'plots' directory exists
+        os.makedirs('./plots', exist_ok=True)
+        file_path = os.path.join('./plots', f"{save_file}")
+
+        # Save the figure as a high-quality PNG file
+        fig.write_image(file_path, format="png", scale=3)  # Increased scale for better quality
+        print(f"Plot saved as {file_path}")
+    else:
+        fig.show()
+
     return

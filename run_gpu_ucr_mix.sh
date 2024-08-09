@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:2
 #SBATCH --nodelist=ai-gpgpu14
 source ~/.bashrc
 hostname
@@ -69,15 +69,15 @@ aug_tech_mix=(
     'parallel_combined17' 'parallel_combined18' 'parallel_combined19' 'parallel_combined20'
 )
 
-# Loop over each dataset and augmentation technique and run the Python script
-for dataset in $datasets; do
-  for aug in "${aug_tech_mix[@]}"; do
-    if [[ "$aug" == "sequential_magnitude1" || "$aug" == "sequential_magnitude2" || "$aug" == "sequential_magnitude4" ]]; then
-      for ratio in 1; do
-        python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=lfcn
-      done
-    else
-      python3 main2.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=1 --optimizer=adam --model=lfcn
-    fi
+# Loop over each ratio, dataset, and augmentation technique and run the Python script
+for ratio in $(seq 1 2); do
+  for dataset in $datasets; do
+    for aug in "${aug_tech_mix[@]}"; do
+      if [[ "$aug" == "sequential_magnitude1" || "$aug" == "sequential_magnitude2" || "$aug" == "sequential_magnitude4" ]]; then
+        python3 main.py --gpus=2 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=esat
+      else
+        python3 main2.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=esat
+      fi
+    done
   done
 done

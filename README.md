@@ -28,7 +28,7 @@ pip install torch==2.3.1 keras==2.13.1 numpy1.26.4' matplotlib==3.9.0 scikit-ima
 
 ### Jupyter Example
 
-[Jupyter Notebook](./example.ipynb)
+[Jupyter Notebook](visual/example.ipynb)
 
 ### Keras Example
 

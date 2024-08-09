@@ -174,8 +174,8 @@ if __name__ == '__main__':
 
     # Training loop
     if args.train:
-        model.train()
         for epoch in range(nb_epochs):
+            model.train()
             epoch_loss = 0.0
             epoch_correct = 0
             epoch_total = 0

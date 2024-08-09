@@ -19,31 +19,46 @@ from utils.input_data import get_datasets
 from utils.save_result import save_accuracy
 
 
-def wrap_model_with_dataparallel(model, device, gpus):
+def wrap_model_with_dataparallel(model, device=None, gpus=1):
     """
     Wrap the model using DataParallel to use multiple GPUs if available.
 
     Parameters:
     model (torch.nn.Module): The model to wrap.
-    device (torch.device): The device to move the model to.
+    device (torch.device or None): The device to move the model to. If None, automatically select device.
     gpus (int): The number of GPUs to use.
 
     Returns:
     torch.nn.Module: The wrapped model.
     """
-    if torch.cuda.is_available():
+    # Determine the device if not specified
+    if device is None:
+        if torch.cuda.is_available() and gpus > 0:
+            device = torch.device("cuda")
+        elif torch.backends.mps.is_available():
+            device = torch.device("mps")
+        else:
+            device = torch.device("cpu")
+
+    # Move the model to the selected device
+    model = model.to(device)
+
+    # If using CUDA, wrap the model with DataParallel
+    if device.type == "cuda" and gpus > 1:
         assert torch.cuda.device_count() >= gpus, f"Not enough GPUs available. Required: {gpus}, Available: {torch.cuda.device_count()}"
         gpu_ids = [i for i in range(gpus)]
         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, gpu_ids))
         model = nn.DataParallel(model, device_ids=gpu_ids)
-    return model.to(device)
+
+    return model
 
 
 if __name__ == '__main__':
     args = argument_parser()
 
     # Check if CUDA is available and set the device
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(
+        'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
     print(f'Using device: {device}')
 
     # Number of classes and dimensions

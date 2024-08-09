@@ -36,6 +36,10 @@ def get_model(model_name, input_shape, nb_class):
         model = ResNet(input_shape, nb_class)
     elif model_name == "lfcn":
         model = LSTMFCN(input_shape, nb_class)
+    elif model_name == "stran":
+        model = SelfTransformer(input_shape, nb_class)
+    elif model_name == "esat":
+        model = ESAT(input_shape, nb_class)
     else:
         raise ValueError(f"Model {model_name} not found")
     return model
@@ -276,7 +280,7 @@ class LSTMFCN(nn.Module):
         # x shape: (batch_size, timesteps, features)
 
         # LSTM part
-        lstm_out, (hn, cn) = self.lstm(x)  # lstm_out shape: (batch_size, timesteps, 128)
+        lstm_out, _ = self.lstm(x)  # lstm_out shape: (batch_size, timesteps, 128)
         lstm_out = lstm_out[:, -1, :]  # Taking the output of the last time step
         lstm_out = self.dropout(lstm_out)
 
@@ -294,4 +298,71 @@ class LSTMFCN(nn.Module):
         # Fully Connected Layer
         x = self.fc(x)
         return F.softmax(x, dim=1)
+
+
+
+class SelfTransformer(nn.Module):
+    def __init__(self, input_shape, nb_class, d_model=128, nhead=8, num_encoder_layers=3, num_decoder_layers=3, dim_feedforward=512, dropout=0.1):
+        super(SelfTransformer, self).__init__()
+        self.input_shape = input_shape
+        self.nb_class = nb_class
+
+        # Positional Encoding
+        self.pos_encoder = nn.Sequential(
+            nn.Conv1d(input_shape[1], d_model, kernel_size=3, padding=1),
+            nn.ReLU()
+        )
+
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout, batch_first=True)
+        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_encoder_layers)
+
+        self.decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout, batch_first=True)
+        self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers=num_decoder_layers)
+
+        self.fc = nn.Linear(d_model, nb_class)
+
+    def forward(self, x):
+        # x shape: (batch_size, timesteps, features)
+        x = x.permute(0, 2, 1)  # Change to (batch_size, features, timesteps)
+        x = self.pos_encoder(x)  # Apply positional encoding
+        x = x.permute(0, 2, 1)  # Change back to (batch_size, timesteps, features)
+
+        memory = self.transformer_encoder(x)
+        out = self.transformer_decoder(memory, memory)
+
+        out = out.mean(dim=1)  # Global average pooling
+        out = self.fc(out)
+        return F.softmax(out, dim=1)
+
+
+class ESAT(nn.Module):
+    def __init__(self, input_shape, nb_class, d_model=128, nhead=8, num_encoder_layers=3, num_decoder_layers=3, dim_feedforward=256, dropout=0.1):
+        super(ESAT, self).__init__()
+        self.input_shape = input_shape
+        self.nb_class = nb_class
+
+        # Learnable Positional Encoding
+        self.pos_encoder = nn.Embedding(input_shape[0], d_model)
+
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout, batch_first=True)
+        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_encoder_layers)
+
+        self.decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout, batch_first=True)
+        self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers=num_decoder_layers)
+
+        self.layer_norm = nn.LayerNorm(d_model)
+        self.fc = nn.Linear(d_model, nb_class)
+
+    def forward(self, x):
+        # x shape: (batch_size, timesteps, features)
+        positions = torch.arange(0, x.size(1)).unsqueeze(0).expand(x.size(0), -1).to(x.device)
+        x = x + self.pos_encoder(positions)  # Apply learned positional encoding
+
+        memory = self.transformer_encoder(x)
+        memory = self.layer_norm(memory)
+        out = self.transformer_decoder(memory, memory)
+
+        out = out.mean(dim=1)  # Global average pooling
+        out = self.fc(out)
+        return F.softmax(out, dim=1)
 
