@@ -13,6 +13,7 @@ Lab: Prof YU Keping's Lab
 """
 
 import os
+import time
 
 import numpy as np
 import torch
@@ -24,7 +25,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.utils.tensorboard import SummaryWriter
 
 import utils.datasets as ds
-from models import custom_models as mod, mix_augmentation as aug
+from models import custom_models as mod, mix_augmentation_refined as aug
 from utils.argument_parser import argument_parser
 from utils.cache_loss_accuracy import CacheLossAccuracy
 from utils.input_data import get_datasets
@@ -89,7 +90,12 @@ if __name__ == '__main__':
     if args.original:
         augmentation_tags = '_original'
     else:
-        x_train, y_train, augmentation_tags = aug.run_augmentation(x_train.numpy(), y_train.numpy(), args)
+        print(f"Augmentation method: {args.augmentation_method}")
+        started_at = time.time() * 1000  # Convert to milliseconds
+        x_train, y_train, augmentation_tags = aug.run_augmentation_refined(x_train.numpy(), y_train.numpy(), args)
+        ended_at = time.time() * 1000  # Convert to milliseconds
+        duration = ended_at - started_at
+        print(f"Augmentation process took {duration:.2f} ms")
         print(f"x_train shape after augmentation: {x_train.shape}, y_train shape after augmentation: {y_train.shape}")
 
     # Convert augmented data to tensors
@@ -103,7 +109,7 @@ if __name__ == '__main__':
     # Calculate iterations and epochs
     nb_iterations = args.iterations
     batch_size = args.batch_size
-    nb_epochs = int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
+    nb_epochs = 1#int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
     print(f'epoch: {nb_epochs}')
 
     # `mod.get_model` returns a PyTorch model
@@ -169,7 +175,7 @@ if __name__ == '__main__':
 
     # Early stopping parameters
     best_val_loss = float('inf')
-    early_stopping_patience = 200
+    early_stopping_patience = 2
     epochs_no_improve = 0
 
     # Training loop
@@ -259,7 +265,7 @@ if __name__ == '__main__':
     accur = f'{(100 * correct) / total:.2f}%'
     file_name = f'{args.augmentation_ratio}_{args.dataset}_accuracies.json'
     print(f'Best Train Accuracy: {accur}')
-    save_accuracy(accur, f'{args.dataset}{augmentation_tags}', output_dir, file_name)
+    save_accuracy(accur, f'{args.dataset}{augmentation_tags}', output_dir, file_name, duration)
 
 
     # Save predictions

@@ -2,7 +2,7 @@ import json
 import os
 
 
-def save_accuracy(accuracy, tag, save_path, file_name):
+def save_accuracy(accuracy, tag, save_path, file_name, duration):
     os.makedirs(save_path, exist_ok=True)
     file_path = os.path.join(save_path, file_name)
 
@@ -15,7 +15,10 @@ def save_accuracy(accuracy, tag, save_path, file_name):
 
 
     # Update the model_accuracy dictionary
-    accuracies[tag] = accuracy
+    accuracies[tag] = {
+        'accuracy': accuracy,
+        'started_at': duration,
+    }
 
     # Save the updated dictionary to a JSON file
     with open(file_path, 'w') as file:

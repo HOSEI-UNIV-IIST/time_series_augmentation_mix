@@ -26,38 +26,48 @@ def argument_parser():
     # Augmentation
     parser.add_argument('--augmentation_ratio', type=int, default=1, help="How many times to augment")
     parser.add_argument('--augmentation_method', type=str, default="simple",
-                        choices=['simple',
-                                 'sequential_magnitude1', 'sequential_magnitude2', 'sequential_magnitude3',
-                                 'sequential_magnitude4',
-                                 'sequential_magnitude5', 'sequential_magnitude6', 'sequential_magnitude7',
-                                 'sequential_magnitude8',
-                                 'sequential_time1', 'sequential_time2', 'sequential_time3', 'sequential_time4',
-                                 'sequential_time5', 'sequential_time6', 'sequential_time7', 'sequential_time8',
-                                 'parallel_magnitude1', 'parallel_magnitude2', 'parallel_magnitude3',
-                                 'parallel_magnitude4',
-                                 'parallel_magnitude5', 'parallel_magnitude6', 'parallel_magnitude7',
-                                 'parallel_magnitude8',
-                                 'parallel_time1', 'parallel_time2', 'parallel_time3', 'parallel_time4',
-                                 'parallel_time5', 'parallel_time6', 'parallel_time7', 'parallel_time8',
-                                 'sequential_combined1', 'sequential_combined2', 'sequential_combined3',
-                                 'sequential_combined4',
-                                 'sequential_combined5', 'sequential_combined6', 'sequential_combined7',
-                                 'sequential_combined8',
-                                 'sequential_combined9', 'sequential_combined10', 'sequential_combined11',
-                                 'sequential_combined12',
-                                 'sequential_combined13', 'sequential_combined14', 'sequential_combined15',
-                                 'sequential_combined16',
-                                 'sequential_combined17', 'sequential_combined18', 'sequential_combined19',
-                                 'sequential_combined20',
-                                 'parallel_combined1', 'parallel_combined2', 'parallel_combined3', 'parallel_combined4',
-                                 'parallel_combined5', 'parallel_combined6', 'parallel_combined7', 'parallel_combined8',
-                                 'parallel_combined9', 'parallel_combined10', 'parallel_combined11',
-                                 'parallel_combined12',
-                                 'parallel_combined13', 'parallel_combined14', 'parallel_combined15',
-                                 'parallel_combined16',
-                                 'parallel_combined17', 'parallel_combined18', 'parallel_combined19',
-                                 'parallel_combined20'],
-                        help="Augmentation method")
+                        choices=[
+                            'simple',
+                            # Sequential Magnitude Methods (Uniq and Multi)
+                            'sequential_magnitude_uniq1', 'sequential_magnitude_uniq2', 'sequential_magnitude_uniq3',
+                            'sequential_magnitude_uniq4',
+                            'sequential_magnitude_multi1', 'sequential_magnitude_multi2', 'sequential_magnitude_multi3',
+                            'sequential_magnitude_multi4',
+                            # Sequential Time Methods (Uniq and Multi)
+                            'sequential_time_uniq1', 'sequential_time_uniq2', 'sequential_time_uniq3',
+                            'sequential_time_uniq4',
+                            'sequential_time_multi1', 'sequential_time_multi2', 'sequential_time_multi3',
+                            'sequential_time_multi4',
+                            # Sequential Combined Methods
+                            'sequential_combined1', 'sequential_combined2', 'sequential_combined3',
+                            'sequential_combined4', 'sequential_combined5', 'sequential_combined6',
+                            'sequential_combined7', 'sequential_combined8', 'sequential_combined9',
+                            'sequential_combined10', 'sequential_combined11', 'sequential_combined12',
+                            # Parallel Magnitude Methods (Unique Block and Mixed)
+                            'parallel_magnitude_uniq_block1', 'parallel_magnitude_uniq_block2',
+                            'parallel_magnitude_uniq_block3', 'parallel_magnitude_uniq_block4',
+                            'parallel_magnitude_uniq_mixed1', 'parallel_magnitude_uniq_mixed2',
+                            'parallel_magnitude_uniq_mixed3', 'parallel_magnitude_uniq_mixed4',
+                            'parallel_magnitude_multi_block1', 'parallel_magnitude_multi_block2',
+                            'parallel_magnitude_multi_block3', 'parallel_magnitude_multi_block4',
+                            'parallel_magnitude_multi_mixed1', 'parallel_magnitude_multi_mixed2',
+                            'parallel_magnitude_multi_mixed3', 'parallel_magnitude_multi_mixed4',
+                            # Parallel Time Methods (Unique Block and Mixed)
+                            'parallel_time_uniq_block1', 'parallel_time_uniq_block2',
+                            'parallel_time_uniq_block3', 'parallel_time_uniq_block4',
+                            'parallel_time_uniq_mixed1', 'parallel_time_uniq_mixed2',
+                            'parallel_time_uniq_mixed3', 'parallel_time_uniq_mixed4',
+                            'parallel_time_multi_block1', 'parallel_time_multi_block2',
+                            'parallel_time_multi_block3', 'parallel_time_multi_block4',
+                            'parallel_time_multi_mixed1', 'parallel_time_multi_mixed2',
+                            'parallel_time_multi_mixed3', 'parallel_time_multi_mixed4',
+                            # Parallel Combined Methods
+                            'parallel_combined1', 'parallel_combined2', 'parallel_combined3',
+                            'parallel_combined4', 'parallel_combined5', 'parallel_combined6',
+                            'parallel_combined7', 'parallel_combined8', 'parallel_combined9',
+                            'parallel_combined10', 'parallel_combined11', 'parallel_combined12'
+                        ],
+                        help="Augmentation method to apply")
 
     parser.add_argument('--num_augmentations', type=int, default=3, help="Number of random augmentations to apply")
     parser.add_argument('--seed', type=int, default=20240609, help="Randomization seed")
