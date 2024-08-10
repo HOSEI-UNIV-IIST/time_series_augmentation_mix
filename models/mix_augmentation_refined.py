@@ -16,38 +16,56 @@ import re
 import numpy as np
 
 
+
+import re
+import numpy as np
+
+
 def run_augmentation_refined(x, y, args):
+    """
+    Orchestrates the augmentation process based on the method specified in args.
+    :param x: Input data
+    :param y: Labels
+    :param args: Arguments containing augmentation settings
+    :return: Augmented data, augmented labels, and augmentation tags
+    """
     print(f"Augmenting {args.dataset}")
     np.random.seed(args.seed)
 
-    x_aug = x
-    y_aug = y
     augmentation_tags = args.extra_tag
     ratio = args.augmentation_ratio * 4 if 'sequential' in args.augmentation_method else args.augmentation_ratio
 
     if ratio > 0:
         initial_tags = f"{args.augmentation_ratio}"
 
-        # Perform augmentation based on the method
+        # Determine the augmentation method to apply
         if 'sequential' in args.augmentation_method:
-            x_temp, y_temp, temp_tags = augment_sequential(x_aug, y_aug, args)
+            x_temp, y_temp, temp_tags = augment_sequential(x, y, args)
         elif 'parallel' in args.augmentation_method:
             x_temp, y_temp, temp_tags = augment_parallel(x, y, args)
         elif args.augmentation_method == 'simple':
             x_temp, temp_tags = augment_data_simple(x, args)
+            y_temp = y  # For simple methods, y remains the same
         else:
             raise ValueError(f"Unknown augmentation method: {args.augmentation_method}")
 
-        x_aug = np.append(x_aug, x_temp, axis=0)
-        y_aug = np.append(y_aug, y_temp, axis=0)
+        # Ensure that the feature dimension matches before concatenation
+        if x.shape[1] != x_temp.shape[1]:
+            raise ValueError(
+                f"Mismatch in the feature dimension: x.shape[1]={x.shape[1]}, x_temp.shape[1]={x_temp.shape[1]}")
+
+        # Augmented data is directly concatenated with original data
+        x_aug = np.concatenate((x, x_temp), axis=0)
+        y_aug = np.concatenate((y, y_temp), axis=0)
+
+        print(f"x_temp.shape: {x_temp.shape}, y_temp.shape: {y_temp.shape}")
+        print(f"x_aug.shape: {x_aug.shape}, y_aug.shape: {y_aug.shape}")
         print(f"Augmentation done: {augmentation_tags + temp_tags}")
 
-        # Combine the tags correctly
-        if args.extra_tag:
-            augmentation_tags = f"{initial_tags}_{args.extra_tag}_{temp_tags}"
-        else:
-            augmentation_tags = f"{initial_tags}{temp_tags}"
+        # Update augmentation tags
+        augmentation_tags = f"{initial_tags}_{args.extra_tag}_{temp_tags}" if args.extra_tag else f"{initial_tags}{temp_tags}"
     else:
+        x_aug, y_aug = x, y  # No augmentation, just return original data
         augmentation_tags = args.extra_tag
 
     return x_aug, y_aug, augmentation_tags

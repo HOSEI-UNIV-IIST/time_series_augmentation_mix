@@ -85,10 +85,10 @@ aug_tech_mix=(
 )
 
 # Loop over each ratio, dataset, and augmentation technique and run the Python script
-for ratio in $(seq 1 2); do
+for ratio in $(seq 1); do
   for dataset in $datasets; do
     for aug in "${aug_tech_mix[@]}"; do
-      python3 main.py --gpus=2 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
+      python3 main.py --gpus=2 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=gru1
     done
   done
 done

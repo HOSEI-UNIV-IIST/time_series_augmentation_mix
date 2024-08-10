@@ -109,7 +109,7 @@ if __name__ == '__main__':
     # Calculate iterations and epochs
     nb_iterations = args.iterations
     batch_size = args.batch_size
-    nb_epochs = 1#int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
+    nb_epochs = int(np.ceil(nb_iterations * (batch_size / x_train.shape[0])))
     print(f'epoch: {nb_epochs}')
 
     # `mod.get_model` returns a PyTorch model
@@ -175,7 +175,13 @@ if __name__ == '__main__':
 
     # Early stopping parameters
     best_val_loss = float('inf')
-    early_stopping_patience = 2
+    if args.model == "fcnn":
+        early_stopping_patience = 1000
+    elif args.model in ["lstm1", "lstm2", "gru1", "gru2"]:
+        early_stopping_patience = 1000
+    else:
+        early_stopping_patience = 200
+
     epochs_no_improve = 0
 
     # Training loop
