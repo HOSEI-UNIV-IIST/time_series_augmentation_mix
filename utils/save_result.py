@@ -17,7 +17,7 @@ def save_accuracy(accuracy, tag, save_path, file_name, duration):
     # Update the model_accuracy dictionary
     accuracies[tag] = {
         'accuracy': accuracy,
-        'started_at': duration,
+        'duration': duration,
     }
 
     # Save the updated dictionary to a JSON file

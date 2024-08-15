@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #SBATCH --nodelist=ai-gpgpu14
 source ~/.bashrc
 hostname
@@ -62,21 +62,21 @@ aug_tech_mix=(
     # Parallel Magnitude Methods
     'parallel_magnitude_uniq_block1' 'parallel_magnitude_uniq_block2'
     'parallel_magnitude_uniq_block3' 'parallel_magnitude_uniq_block4'
-    'parallel_magnitude_uniq_mixed1' 'parallel_magnitude_uniq_mixed2'
-    'parallel_magnitude_uniq_mixed3' 'parallel_magnitude_uniq_mixed4'
+    #'parallel_magnitude_uniq_mixed1' 'parallel_magnitude_uniq_mixed2'
+    #'parallel_magnitude_uniq_mixed3' 'parallel_magnitude_uniq_mixed4'
     'parallel_magnitude_multi_block1' 'parallel_magnitude_multi_block2'
     'parallel_magnitude_multi_block3' 'parallel_magnitude_multi_block4'
-    'parallel_magnitude_multi_mixed1' 'parallel_magnitude_multi_mixed2'
-    'parallel_magnitude_multi_mixed3' 'parallel_magnitude_multi_mixed4'
+    #'parallel_magnitude_multi_mixed1' 'parallel_magnitude_multi_mixed2'
+    #'parallel_magnitude_multi_mixed3' 'parallel_magnitude_multi_mixed4'
     # Parallel Time Methods
     'parallel_time_uniq_block1' 'parallel_time_uniq_block2'
     'parallel_time_uniq_block3' 'parallel_time_uniq_block4'
-    'parallel_time_uniq_mixed1' 'parallel_time_uniq_mixed2'
-    'parallel_time_uniq_mixed3' 'parallel_time_uniq_mixed4'
+    #'parallel_time_uniq_mixed1' 'parallel_time_uniq_mixed2'
+    #'parallel_time_uniq_mixed3' 'parallel_time_uniq_mixed4'
     'parallel_time_multi_block1' 'parallel_time_multi_block2'
     'parallel_time_multi_block3' 'parallel_time_multi_block4'
-    'parallel_time_multi_mixed1' 'parallel_time_multi_mixed2'
-    'parallel_time_multi_mixed3' 'parallel_time_multi_mixed4'
+    #'parallel_time_multi_mixed1' 'parallel_time_multi_mixed2'
+    #'parallel_time_multi_mixed3' 'parallel_time_multi_mixed4'
     # Parallel Combined Methods
     'parallel_combined1' 'parallel_combined2' 'parallel_combined3'
     'parallel_combined4' 'parallel_combined5' 'parallel_combined6'
@@ -88,7 +88,7 @@ aug_tech_mix=(
 for ratio in $(seq 1); do
   for dataset in $datasets; do
     for aug in "${aug_tech_mix[@]}"; do
-      python3 main.py --gpus=2 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=gru1
+      python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
     done
   done
 done

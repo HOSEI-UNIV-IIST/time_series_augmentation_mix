@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="/opt/anaconda3/envs/time_series_tf" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="/opt/anaconda3/envs/time_series_augmix" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="time_series" project-jdk-type="Python SDK" />
 </project>

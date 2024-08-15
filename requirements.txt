@@ -11,3 +11,4 @@ tqdm==4.66.4
 einops==0.8.0
 plotly==5.23.0
 kaleido==0.2.1
+scipy==1.14.0

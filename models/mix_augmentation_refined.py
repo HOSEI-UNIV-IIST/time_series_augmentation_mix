@@ -74,9 +74,15 @@ def run_augmentation_refined(x, y, args):
 def augment_sequential(x, y, args):
     method_num = re.search(r'\d+', args.augmentation_method).group()
     if 'magnitude' in args.augmentation_method:
-        func_name = f'ads_magnitude_uniq{method_num}'
+        if 'uniq' in args.augmentation_method:
+            func_name = f'ads_magnitude_uniq{method_num}'
+        elif 'multi' in args.augmentation_method:
+            func_name = f'ads_magnitude_multi{method_num}'
     elif 'time' in args.augmentation_method:
-        func_name = f'ads_time_uniq{method_num}'
+        if 'uniq' in args.augmentation_method:
+            func_name = f'ads_time_uniq{method_num}'
+        elif 'multi' in args.augmentation_method:
+            func_name = f'ads_time_multi{method_num}'
     elif 'combined' in args.augmentation_method:
         func_name = f'ads_sequential_combined{method_num}'
     else:
@@ -95,6 +101,11 @@ def augment_parallel(x, y, args):
             func_name = f'adp_magnitude_uniq_block{method_num}'
         elif 'mixed' in args.augmentation_method:
             func_name = f'adp_magnitude_uniq_mixed{method_num}'
+        elif 'multi' in args.augmentation_method:
+            if 'block' in args.augmentation_method:
+                func_name = f'ads_magnitude_multi_block{method_num}'
+            elif 'mixed' in args.augmentation_method:
+                func_name = f'ads_magnitude_multi_mixed{method_num}'
         else:
             raise ValueError(f"Unknown parallel magnitude method: {args.augmentation_method}")
     elif 'time' in args.augmentation_method:
@@ -102,6 +113,11 @@ def augment_parallel(x, y, args):
             func_name = f'adp_time_uniq_block{method_num}'
         elif 'mixed' in args.augmentation_method:
             func_name = f'adp_time_uniq_mixed{method_num}'
+        elif 'multi' in args.augmentation_method:
+            if 'block' in args.augmentation_method:
+                func_name = f'ads_time_multi_block{method_num}'
+            elif 'mixed' in args.augmentation_method:
+                func_name = f'ads_time_multi_mixed{method_num}'
         else:
             raise ValueError(f"Unknown parallel time method: {args.augmentation_method}")
     elif 'combined' in args.augmentation_method:
