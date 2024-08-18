@@ -18,7 +18,7 @@ ucr_data = [
     "ECG5000",
     "FordB",
     "GunPointAgeSpan",
-    "ScreenType",
+    #"ScreenType",
     "Strawberry",
     "Yoga",
 ]

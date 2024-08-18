@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 #SBATCH --nodelist=ai-gpgpu14
 source ~/.bashrc
 hostname
@@ -50,45 +50,38 @@ fi
 # Define the augmentation techniques directly in the bash file
 aug_tech_mix=(
     # Sequential Magnitude Methods (Uniq and Multi)
-    'sequential_magnitude_uniq1' 'sequential_magnitude_uniq2' 'sequential_magnitude_uniq3' 'sequential_magnitude_uniq4'
-    'sequential_magnitude_multi1' 'sequential_magnitude_multi2' 'sequential_magnitude_multi3' 'sequential_magnitude_multi4'
+    #'sequential_magnitude_uniq1' 'sequential_magnitude_uniq2' 'sequential_magnitude_uniq3' 'sequential_magnitude_uniq4'
+    #'sequential_magnitude_multi1' 'sequential_magnitude_multi2' 'sequential_magnitude_multi3' 'sequential_magnitude_multi4'
     # Sequential Time Methods (Uniq and Multi)
-    'sequential_time_uniq1' 'sequential_time_uniq2' 'sequential_time_uniq3' 'sequential_time_uniq4'
-    'sequential_time_multi1' 'sequential_time_multi2' 'sequential_time_multi3' 'sequential_time_multi4'
+    #'sequential_time_uniq1' 'sequential_time_uniq2' 'sequential_time_uniq3' 'sequential_time_uniq4'
+    #'sequential_time_multi1' 'sequential_time_multi2' 'sequential_time_multi3' 'sequential_time_multi4'
     # Sequential Combined Methods
-    'sequential_combined1' 'sequential_combined2' 'sequential_combined3' 'sequential_combined4'
-    'sequential_combined5' 'sequential_combined6' 'sequential_combined7' 'sequential_combined8'
-    'sequential_combined9' 'sequential_combined10' 'sequential_combined11' 'sequential_combined12'
+    #'sequential_combined1' 'sequential_combined2' 'sequential_combined3' 'sequential_combined4'
+    #'sequential_combined5' 'sequential_combined6' 'sequential_combined7' 'sequential_combined8'
+    #'sequential_combined9' 'sequential_combined10' 'sequential_combined11' 'sequential_combined12'
+
     # Parallel Magnitude Methods
-    'parallel_magnitude_uniq_block1' 'parallel_magnitude_uniq_block2'
-    'parallel_magnitude_uniq_block3' 'parallel_magnitude_uniq_block4'
-    #'parallel_magnitude_uniq_mixed1' 'parallel_magnitude_uniq_mixed2'
-    #'parallel_magnitude_uniq_mixed3' 'parallel_magnitude_uniq_mixed4'
-    'parallel_magnitude_multi_block1' 'parallel_magnitude_multi_block2'
-    'parallel_magnitude_multi_block3' 'parallel_magnitude_multi_block4'
-    #'parallel_magnitude_multi_mixed1' 'parallel_magnitude_multi_mixed2'
-    #'parallel_magnitude_multi_mixed3' 'parallel_magnitude_multi_mixed4'
+    'parallel_magnitude_uniq1' 'parallel_magnitude_uniq2'
+    'parallel_magnitude_uniq3' 'parallel_magnitude_uniq4'
+    'parallel_magnitude_multi1' 'parallel_magnitude_multi2'
+    'parallel_magnitude_multi3' 'parallel_magnitude_multi4'
     # Parallel Time Methods
-    'parallel_time_uniq_block1' 'parallel_time_uniq_block2'
-    'parallel_time_uniq_block3' 'parallel_time_uniq_block4'
-    #'parallel_time_uniq_mixed1' 'parallel_time_uniq_mixed2'
-    #'parallel_time_uniq_mixed3' 'parallel_time_uniq_mixed4'
-    'parallel_time_multi_block1' 'parallel_time_multi_block2'
-    'parallel_time_multi_block3' 'parallel_time_multi_block4'
-    #'parallel_time_multi_mixed1' 'parallel_time_multi_mixed2'
-    #'parallel_time_multi_mixed3' 'parallel_time_multi_mixed4'
+    'parallel_time_uniq1' 'parallel_time_uniq2'
+    'parallel_time_uniq3' 'parallel_time_uniq4'
+    'parallel_time_multi1' 'parallel_time_multi2'
+    'parallel_time_multi3' 'parallel_time_multi4'
     # Parallel Combined Methods
-    'parallel_combined1' 'parallel_combined2' 'parallel_combined3'
-    'parallel_combined4' 'parallel_combined5' 'parallel_combined6'
-    'parallel_combined7' 'parallel_combined8' 'parallel_combined9'
-    'parallel_combined10' 'parallel_combined11' 'parallel_combined12'
+    #'parallel_combined1' 'parallel_combined2' 'parallel_combined3'
+    #'parallel_combined4' 'parallel_combined5' 'parallel_combined6'
+    #'parallel_combined7' 'parallel_combined8' 'parallel_combined9'
+    #'parallel_combined10' 'parallel_combined11' 'parallel_combined12'
 )
 
 # Loop over each ratio, dataset, and augmentation technique and run the Python script
 for ratio in $(seq 1); do
   for dataset in $datasets; do
     for aug in "${aug_tech_mix[@]}"; do
-      python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
+      python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
     done
   done
 done

@@ -89,6 +89,7 @@ if __name__ == '__main__':
     # Augment data
     if args.original:
         augmentation_tags = '_original'
+        duration = 0
     else:
         print(f"Augmentation method: {args.augmentation_method}")
         started_at = time.time() * 1000  # Convert to milliseconds

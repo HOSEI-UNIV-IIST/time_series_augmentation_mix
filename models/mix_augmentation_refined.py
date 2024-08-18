@@ -97,27 +97,17 @@ def augment_sequential(x, y, args):
 def augment_parallel(x, y, args):
     method_num = re.search(r'\d+', args.augmentation_method).group()
     if 'magnitude' in args.augmentation_method:
-        if 'block' in args.augmentation_method:
-            func_name = f'adp_magnitude_uniq_block{method_num}'
-        elif 'mixed' in args.augmentation_method:
-            func_name = f'adp_magnitude_uniq_mixed{method_num}'
+        if 'uniq' in args.augmentation_method:
+            func_name = f'adp_magnitude_uniq{method_num}'
         elif 'multi' in args.augmentation_method:
-            if 'block' in args.augmentation_method:
-                func_name = f'ads_magnitude_multi_block{method_num}'
-            elif 'mixed' in args.augmentation_method:
-                func_name = f'ads_magnitude_multi_mixed{method_num}'
+            func_name = f'adp_magnitude_multi{method_num}'
         else:
             raise ValueError(f"Unknown parallel magnitude method: {args.augmentation_method}")
     elif 'time' in args.augmentation_method:
-        if 'block' in args.augmentation_method:
-            func_name = f'adp_time_uniq_block{method_num}'
-        elif 'mixed' in args.augmentation_method:
-            func_name = f'adp_time_uniq_mixed{method_num}'
+        if 'uniq' in args.augmentation_method:
+            func_name = f'adp_time_uniq{method_num}'
         elif 'multi' in args.augmentation_method:
-            if 'block' in args.augmentation_method:
-                func_name = f'ads_time_multi_block{method_num}'
-            elif 'mixed' in args.augmentation_method:
-                func_name = f'ads_time_multi_mixed{method_num}'
+            func_name = f'adp_time_multi{method_num}'
         else:
             raise ValueError(f"Unknown parallel time method: {args.augmentation_method}")
     elif 'combined' in args.augmentation_method:
@@ -419,9 +409,9 @@ def ads_time_multi4(x, y, ratio=1):
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # ————————————————————————————————————————————————————————
-# MAGNITUDE  —  UNIQUE  —  BLOCK
+# MAGNITUDE  —  UNIQUE
 # ————————————————————————————————————————————————————————
-def adp_magnitude_uniq_block1(x, y, ratio=1):
+def adp_magnitude_uniq1(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -435,11 +425,11 @@ def adp_magnitude_uniq_block1(x, y, ratio=1):
     x_combined = np.concatenate([np.tile(x_jitter, (ratio, 1)), x_split[1], x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([np.tile(y_split[0], ratio), y_split[1], y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq_block1_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_uniq1_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_magnitude_uniq_block2(x, y, ratio=1):
+def adp_magnitude_uniq2(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -449,11 +439,11 @@ def adp_magnitude_uniq_block2(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], np.tile(x_rotation, (ratio, 1)), x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], np.tile(y_split[1], ratio), y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq_block2_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_uniq2_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_magnitude_uniq_block3(x, y, ratio=1):
+def adp_magnitude_uniq3(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -463,11 +453,11 @@ def adp_magnitude_uniq_block3(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], np.tile(x_scaling, (ratio, 1)), x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], np.tile(y_split[2], ratio), y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq_block3_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_uniq3_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_magnitude_uniq_block4(x, y, ratio=1):
+def adp_magnitude_uniq4(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -477,73 +467,13 @@ def adp_magnitude_uniq_block4(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], x_split[2], np.tile(x_magnitude_warp, (ratio, 1))], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], y_split[2], np.tile(y_split[3], ratio)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq_block4_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_uniq4_{ratio}x"
     return x_combined, y_combined, augmentation_tags
-
 
 # ————————————————————————————————————————————————————————
-# MAGNITUDE  —  UNIQUE  —  MIXED
+# MAGNITUDE  —  MULTIPLE
 # ————————————————————————————————————————————————————————
-def adp_magnitude_uniq_mixed1(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.jitter(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_magnitude_uniq_mixed1_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_magnitude_uniq_mixed2(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.rotation(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_magnitude_uniq_mixed2_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_magnitude_uniq_mixed3(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.scaling(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_magnitude_uniq_mixed3_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_magnitude_uniq_mixed4(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.magnitude_warp(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_magnitude_uniq_mixed4_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-# ————————————————————————————————————————————————————————
-# MAGNITUDE  —  MULTIPLE  —  BLOCK
-# ————————————————————————————————————————————————————————
-def adp_magnitude_multi_block1(x, y, ratio=1):
+def adp_magnitude_multi1(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -562,11 +492,11 @@ def adp_magnitude_multi_block1(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi_block1_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_multi1_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_magnitude_multi_block2(x, y, ratio=1):
+def adp_magnitude_multi2(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -584,11 +514,11 @@ def adp_magnitude_multi_block2(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi_block2_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_multi2_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_magnitude_multi_block3(x, y, ratio=1):
+def adp_magnitude_multi3(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -606,11 +536,11 @@ def adp_magnitude_multi_block3(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi_block3_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_multi3_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_magnitude_multi_block4(x, y, ratio=1):
+def adp_magnitude_multi4(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -628,102 +558,15 @@ def adp_magnitude_multi_block4(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi_block4_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-# ————————————————————————————————————————————————————————
-# MAGNITUDE  —  MULTIPLE  —  MIXED
-# ————————————————————————————————————————————————————————
-def adp_magnitude_multi_mixed1(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_scaling = aug.scaling(x_split[0].copy())
-    x_rotation = aug.rotation(x_split[1].copy())
-    x_magnitude_warp = aug.magnitude_warp(x_split[2].copy())
-    x_jitter = aug.jitter(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_scaling, x_rotation, x_magnitude_warp, x_jitter))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_magnitude_multi_mixed1_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_magnitude_multi_mixed2(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_rotation = aug.rotation(x_split[0].copy())
-    x_magnitude_warp = aug.magnitude_warp(x_split[1].copy())
-    x_jitter = aug.jitter(x_split[2].copy())
-    x_scaling = aug.scaling(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_rotation, x_magnitude_warp, x_jitter, x_scaling))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_magnitude_multi_mixed2_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_magnitude_multi_mixed3(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_magnitude_warp = aug.magnitude_warp(x_split[0].copy())
-    x_jitter = aug.jitter(x_split[1].copy())
-    x_scaling = aug.scaling(x_split[2].copy())
-    x_rotation = aug.rotation(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_magnitude_warp, x_jitter, x_scaling, x_rotation))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_magnitude_multi_mixed3_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_magnitude_multi_mixed4(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_jitter = aug.jitter(x_split[0].copy())
-    x_scaling = aug.scaling(x_split[1].copy())
-    x_rotation = aug.rotation(x_split[2].copy())
-    x_magnitude_warp = aug.magnitude_warp(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_jitter, x_scaling, x_rotation, x_magnitude_warp))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_magnitude_multi_mixed4_{ratio}x"
+    augmentation_tags = f"_adp_magnitude_multi4_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # ————————————————————————————————————————————————————————
-# TIME  —  UNIQUE  —  BLOCK
+# TIME  —  UNIQUE
 # ————————————————————————————————————————————————————————
-def adp_time_uniq_block1(x, y, ratio=1):
+def adp_time_uniq1(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -736,11 +579,11 @@ def adp_time_uniq_block1(x, y, ratio=1):
     x_combined = np.concatenate([np.tile(x_permutation, (ratio, 1)), x_split[1], x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([np.tile(y_split[0], ratio), y_split[1], y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq_block1_{ratio}x"
+    augmentation_tags = f"_adp_time_uniq1_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_time_uniq_block2(x, y, ratio=1):
+def adp_time_uniq2(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -750,11 +593,11 @@ def adp_time_uniq_block2(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], np.tile(x_window_slice, (ratio, 1)), x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], np.tile(y_split[1], ratio), y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq_block2_{ratio}x"
+    augmentation_tags = f"_adp_time_uniq2_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_time_uniq_block3(x, y, ratio=1):
+def adp_time_uniq3(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -764,11 +607,11 @@ def adp_time_uniq_block3(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], np.tile(x_time_warp, (ratio, 1)), x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], np.tile(y_split[2], ratio), y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq_block3_{ratio}x"
+    augmentation_tags = f"_adp_time_uniq3_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_time_uniq_block4(x, y, ratio=1):
+def adp_time_uniq4(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -778,73 +621,14 @@ def adp_time_uniq_block4(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], x_split[2], np.tile(x_window_warp, (ratio, 1))], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], y_split[2], np.tile(y_split[3], ratio)], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq_block4_{ratio}x"
+    augmentation_tags = f"_adp_time_uniq4_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
 # ————————————————————————————————————————————————————————
-# TIME  —  UNIQUE  —  MIXED
+# TIME  —  MULTIPLE
 # ————————————————————————————————————————————————————————
-def adp_time_uniq_mixed1(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.permutation(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_time_uniq_mixed1_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_time_uniq_mixed2(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.window_slice(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_time_uniq_mixed2_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_time_uniq_mixed3(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.time_warp(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_time_uniq_mixed3_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_time_uniq_mixed4(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-    x_augmented = np.concatenate([aug.window_warp(x_split[i].copy()) for i in range(4)])
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(np.concatenate(y_split), ratio)
-
-    augmentation_tags = f"_adp_time_uniq_mixed4_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-# ————————————————————————————————————————————————————————
-# TIME  —  MULTIPLE  —  BLOCK
-# ————————————————————————————————————————————————————————
-def adp_time_multi_block1(x, y, ratio=1):
+def adp_time_multi1(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -863,11 +647,11 @@ def adp_time_multi_block1(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi_block1_{ratio}x"
+    augmentation_tags = f"_adp_time_multi1_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_time_multi_block2(x, y, ratio=1):
+def adp_time_multi2(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -885,11 +669,11 @@ def adp_time_multi_block2(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi_block2_{ratio}x"
+    augmentation_tags = f"_adp_time_multi2_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_time_multi_block3(x, y, ratio=1):
+def adp_time_multi3(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -907,11 +691,11 @@ def adp_time_multi_block3(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi_block3_{ratio}x"
+    augmentation_tags = f"_adp_time_multi3_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
 
-def adp_time_multi_block4(x, y, ratio=1):
+def adp_time_multi4(x, y, ratio=1):
     import utils.data_partitioning as partition
     import utils.augmentation as aug
 
@@ -929,95 +713,9 @@ def adp_time_multi_block4(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi_block4_{ratio}x"
+    augmentation_tags = f"_adp_time_multi4_{ratio}x"
     return x_combined, y_combined, augmentation_tags
 
-
-# ————————————————————————————————————————————————————————
-# TIME  —  MULTIPLE  —  MIXED
-# ————————————————————————————————————————————————————————
-def adp_time_multi_mixed1(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_permutation = aug.permutation(x_split[0].copy())
-    x_window_slice = aug.window_slice(x_split[1].copy())
-    x_time_warp = aug.time_warp(x_split[2].copy())
-    x_window_warp = aug.window_warp(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_permutation, x_window_slice, x_time_warp, x_window_warp))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_time_multi_mixed1_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_time_multi_mixed2(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_window_slice = aug.window_slice(x_split[0].copy())
-    x_time_warp = aug.time_warp(x_split[1].copy())
-    x_window_warp = aug.window_warp(x_split[2].copy())
-    x_permutation = aug.permutation(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_window_slice, x_time_warp, x_window_warp, x_permutation))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_time_multi_mixed2_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_time_multi_mixed3(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_time_warp = aug.time_warp(x_split[0].copy())
-    x_window_warp = aug.window_warp(x_split[1].copy())
-    x_permutation = aug.permutation(x_split[2].copy())
-    x_window_slice = aug.window_slice(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_time_warp, x_window_warp, x_permutation, x_window_slice))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_time_multi_mixed3_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
-
-
-def adp_time_multi_mixed4(x, y, ratio=1):
-    import utils.data_partitioning as partition
-    import utils.augmentation as aug
-
-    x_split, y_split = partition.divide_dataset(x, y, 4)
-
-    x_window_warp = aug.window_warp(x_split[0].copy())
-    x_permutation = aug.permutation(x_split[1].copy())
-    x_window_slice = aug.window_slice(x_split[2].copy())
-    x_time_warp = aug.time_warp(x_split[3].copy())
-
-    x_augmented = np.concatenate((x_window_warp, x_permutation, x_window_slice, x_time_warp))
-    y_augmented = np.concatenate((y_split[0], y_split[1], y_split[2], y_split[3]))
-
-    x_combined = np.tile(x_augmented, (ratio, 1))
-    y_combined = np.tile(y_augmented, ratio)
-
-    augmentation_tags = f"_adp_time_multi_mixed4_{ratio}x"
-    return x_combined, y_combined, augmentation_tags
 
 
 # ╔══════════════════════════════════════════════════════════════════╗
