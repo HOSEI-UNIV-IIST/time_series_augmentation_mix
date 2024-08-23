@@ -11,7 +11,7 @@
 
 > This order balances both accuracy and computational efficiency, making it more suitable for performance-critical applications.
 
-> Max Accuracy;Avg Accuracy;Min Time (ms);Avg Time (ms);Min Accuracy;Max Time (ms)
+> Highest (Max Accuracy;Avg Accuracy); Lowest (Min Time (ms);Avg Time (ms);Min Accuracy); Highest (Max Time (ms))
 ——————————————————————————
 ## 1.   Simple
 
@@ -194,6 +194,8 @@ Abbreviations Explanation:
 |                             | ads_mag_m3, ads_mag_m4, adp_mag_u1, adp_mag_u2, adp_mag_u3, adp_mag_u4,|
 |                             | adp_mag_m1, adp_mag_m2, adp_mag_m3, adp_mag_m4                        |
 | --------------------------- |------------------------------------------------------------------------|
+
+## Table: Group | Enumerated Abbreviations Parallel
 
 | **Abbreviation**  | **Augmentations (Order is Important)**                          |
 |-------------------|-----------------------------------------------------------------|
