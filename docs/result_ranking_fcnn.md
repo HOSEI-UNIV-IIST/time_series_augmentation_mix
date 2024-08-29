@@ -195,6 +195,15 @@ Abbreviations Explanation:
 |                             | adp_mag_m1, adp_mag_m2, adp_mag_m3, adp_mag_m4                        |
 | --------------------------- |------------------------------------------------------------------------|
 
+
+| magnitude         | abbreviation | time            | abbreviation |
+|-------------------|--------------|-----------------|--------------|
+| jittering         | jit          | permutation     | perm         |
+| rotation          | rot          | window slicing  | wslice       |
+| scaling           | scal         | time warping    | twarp        |
+| magnitude warping | mwarp        | window warping  | wwarp        |
+
+
 ## Table: Group | Enumerated Abbreviations Parallel
 
 | **Abbreviation**  | **Augmentations (Order is Important)**                          |

@@ -24,7 +24,7 @@ ucr_data = [
 ]
 
 techniques_groups = {
-    'Sequential Methods': [
+    'Sequential': [
         "ads_sequential_combined1_1x", "ads_sequential_combined2_1x",
         "ads_sequential_combined3_1x", "ads_sequential_combined4_1x",
         "ads_sequential_combined5_1x", "ads_sequential_combined6_1x",
@@ -32,7 +32,7 @@ techniques_groups = {
         "ads_sequential_combined9_1x", "ads_sequential_combined10_1x",
         "ads_sequential_combined11_1x", "ads_sequential_combined12_1x"
     ],
-    'Parallel Methods': [
+    'Parallel': [
         "adp_parallel_combined1_1x", "adp_parallel_combined2_1x",
         "adp_parallel_combined3_1x", "adp_parallel_combined4_1x",
         "adp_parallel_combined5_1x", "adp_parallel_combined6_1x",
@@ -40,7 +40,7 @@ techniques_groups = {
         "adp_parallel_combined9_1x", "adp_parallel_combined10_1x",
         "adp_parallel_combined11_1x", "adp_parallel_combined12_1x"
     ],
-    'Time-based Methods': [
+    'Time-based': [
         "ads_time_uniq1_1x", "ads_time_uniq2_1x",
         "ads_time_uniq3_1x", "ads_time_uniq4_1x",
         "ads_time_multi1_1x", "ads_time_multi2_1x",
@@ -50,7 +50,7 @@ techniques_groups = {
         "adp_time_multi1_1x", "adp_time_multi2_1x",
         "adp_time_multi3_1x", "adp_time_multi4_1x"
     ],
-    'Magnitude-based Methods': [
+    'Magnitude-based': [
         "ads_magnitude_uniq1_1x", "ads_magnitude_uniq2_1x",
         "ads_magnitude_uniq3_1x", "ads_magnitude_uniq4_1x",
         "ads_magnitude_multi1_1x", "ads_magnitude_multi2_1x",

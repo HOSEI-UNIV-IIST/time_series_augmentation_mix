@@ -3,7 +3,6 @@ import os
 import numpy as np
 import plotly.graph_objs as go
 
-
 def plot2d(x, y, x2=None, y2=None, x3=None, y3=None, xlim=(-1, 1), ylim=(-1, 1), save_file=""):
     import matplotlib.pyplot as plt
 
@@ -78,12 +77,10 @@ def load_x_train(name, extension="npy"):
     return x_train
 
 
-import plotly.graph_objs as go
-import numpy as np
-import os
+
 
 def plot1d_plotly(x, x2=None, x3=None, label1='original', label2='x2', label3='x3', ylim=(-1, 1), save_file=''):
-    # Create steps for x-axis
+    # Create steps for the x-axis
     steps = np.arange(x.shape[0])
 
     # Create the plot using Plotly
@@ -100,10 +97,26 @@ def plot1d_plotly(x, x2=None, x3=None, label1='original', label2='x2', label3='x
     if x3 is not None:
         fig.add_trace(go.Scatter(x=steps, y=x3, mode='lines', name=label3))
 
-    # Update layout with the legend at the bottom
+    # Update layout with visible axes and a white background
     fig.update_layout(
-        xaxis=dict(range=[0, x.shape[0]]),
-        yaxis=dict(range=ylim),
+        xaxis=dict(
+            range=[0, x.shape[0]],
+            showline=True,  # Ensure the x-axis line is visible
+            showgrid=False,  # Optionally disable grid lines
+            zeroline=False,  # Optionally disable the zero line
+            linecolor='black',  # Make sure the axis line is black
+            tickcolor='black',  # Make sure the tick marks are black
+            tickfont=dict(color='black')  # Make sure the tick labels are black
+        ),
+        yaxis=dict(
+            range=ylim,
+            showline=True,  # Ensure the y-axis line is visible
+            showgrid=False,  # Optionally disable grid lines
+            zeroline=False,  # Optionally disable the zero line
+            linecolor='black',  # Make sure the axis line is black
+            tickcolor='black',  # Make sure the tick marks are black
+            tickfont=dict(color='black')  # Make sure the tick labels are black
+        ),
         width=600,  # Increased width for higher resolution
         height=300,  # Increased height for higher resolution
         margin=dict(l=40, r=40, t=40, b=100),  # Adjusted bottom margin for legend
@@ -115,17 +128,21 @@ def plot1d_plotly(x, x2=None, x3=None, label1='original', label2='x2', label3='x
             x=0.5,
             font=dict(color="black"),
         ),
+        plot_bgcolor='white',  # White plot background
+        paper_bgcolor='white',  # White paper background
     )
 
     # Save or show the figure
     if save_file:
-        # Ensure the 'plots' directory exists
+        plot_base_path = "./plots/"
+        file_name = f'{label2}.eps'
         os.makedirs('./plots', exist_ok=True)
-        file_path = os.path.join('./plots', f"{save_file}")
-
-        # Save the figure as a high-quality PNG file
-        fig.write_image(file_path, format="png", scale=3)  # Increased scale for better quality
-        print(f"Plot saved as {file_path}")
+        path = os.path.join(plot_base_path, save_file, file_name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        
+        # Save the figure as an EPS file
+        fig.write_image(path, format='eps')
+        print(f"Plot saved as {path}")
     else:
         fig.show()
 
