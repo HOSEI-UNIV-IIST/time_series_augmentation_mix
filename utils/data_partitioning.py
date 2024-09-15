@@ -13,7 +13,6 @@ Lab: Prof YU Keping's Lab
 """
 import numpy as np
 
-
 def divide_dataset(x, y, n_parts):
     """
     Divides the dataset into n equal parts.

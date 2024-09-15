@@ -86,6 +86,9 @@ if __name__ == '__main__':
     y_train = F.one_hot(y_train, nb_class).float()
     y_test = F.one_hot(y_test, nb_class).float()
 
+    print(
+        f"x_train shape: {x_train.shape}, y_train shape: {y_train.shape}, x_test shape: {x_test.shape}, y_test shape: {y_test.shape}, "
+    )
     # Augment data
     if args.original:
         augmentation_tags = '_original'
