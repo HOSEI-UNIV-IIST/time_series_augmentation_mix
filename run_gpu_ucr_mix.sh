@@ -49,6 +49,7 @@ fi
 
 # Define the augmentation techniques directly in the bash file
 aug_tech_mix=(
+'sequential_combined5'
     # Sequential Magnitude Methods (Uniq and Multi)
     #'sequential_magnitude_uniq1' 'sequential_magnitude_uniq2' 'sequential_magnitude_uniq3' 'sequential_magnitude_uniq4'
     #'sequential_magnitude_multi1' 'sequential_magnitude_multi2' 'sequential_magnitude_multi3' 'sequential_magnitude_multi4'
@@ -61,15 +62,15 @@ aug_tech_mix=(
     #'sequential_combined9' 'sequential_combined10' 'sequential_combined11' 'sequential_combined12'
 
     # Parallel Magnitude Methods
-    'parallel_magnitude_uniq1' 'parallel_magnitude_uniq2'
-    'parallel_magnitude_uniq3' 'parallel_magnitude_uniq4'
-    'parallel_magnitude_multi1' 'parallel_magnitude_multi2'
-    'parallel_magnitude_multi3' 'parallel_magnitude_multi4'
+    #'parallel_magnitude_uniq1' 'parallel_magnitude_uniq2'
+    #'parallel_magnitude_uniq3' 'parallel_magnitude_uniq4'
+    #'parallel_magnitude_multi1' 'parallel_magnitude_multi2'
+    #'parallel_magnitude_multi3' 'parallel_magnitude_multi4'
     # Parallel Time Methods
-    'parallel_time_uniq1' 'parallel_time_uniq2'
-    'parallel_time_uniq3' 'parallel_time_uniq4'
-    'parallel_time_multi1' 'parallel_time_multi2'
-    'parallel_time_multi3' 'parallel_time_multi4'
+    #'parallel_time_uniq1' 'parallel_time_uniq2'
+    #'parallel_time_uniq3' 'parallel_time_uniq4'
+    #'parallel_time_multi1' 'parallel_time_multi2'
+    #'parallel_time_multi3' 'parallel_time_multi4'
     # Parallel Combined Methods
     #'parallel_combined1' 'parallel_combined2' 'parallel_combined3'
     #'parallel_combined4' 'parallel_combined5' 'parallel_combined6'
@@ -81,7 +82,7 @@ aug_tech_mix=(
 for ratio in $(seq 1); do
   for dataset in $datasets; do
     for aug in "${aug_tech_mix[@]}"; do
-      python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
+      python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method="$aug" --augmentation_ratio=$ratio --optimizer=adam --model=fcn
     done
   done
 done

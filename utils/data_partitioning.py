@@ -26,7 +26,6 @@ def divide_dataset(x, y, n_parts):
     return x_split, y_split
 
 
-
 def duplicate_and_concatenate(x, y, ratio):
     """
     Duplicates the dataset based on the ratio and concatenates it to form a larger dataset.
@@ -35,7 +34,12 @@ def duplicate_and_concatenate(x, y, ratio):
     :param ratio: Number of times the dataset should be duplicated
     :return: Duplicated and concatenated dataset and labels
     """
-    x_augmented = np.tile(x, (ratio, 1))
-    y_augmented = np.tile(y, ratio)
+    # Repeat rows of x `ratio` times
+    x_augmented = np.repeat(x, ratio, axis=0)
+
+    # Repeat elements in y to match the number of duplicated rows
+    y_augmented = np.repeat(y, ratio, axis=0)
+
     return x_augmented, y_augmented
+
 

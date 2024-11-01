@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --nodelist=ai-gpgpu14
 source ~/.bashrc
 hostname
@@ -48,14 +48,14 @@ if [[ -z "$datasets" ]]; then
 fi
 
 # Define the augmentation techniques directly in the bash file
-aug_tech=('--original')
+aug_tech=('--original' '--jitter' '--scaling' '--permutation' '--magwarp' '--timewarp' '--windowslice' '--windowwarp' '--rotation')
 
 
 # Loop over each ratio, dataset, and augmentation technique and run the Python script
 for ratio in $(seq 1); do
   for dataset in $datasets; do
     for aug in "${aug_tech[@]}"; do
-      python3 main.py --gpus=1 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method=simple "$aug"=True --augmentation_ratio=$ratio --optimizer=adam --model=fcnn
+      python3 main.py --gpus=2 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save --augmentation_method=simple "$aug"=True --augmentation_ratio=$ratio --optimizer=adam --model=lfcn
     done
   done
 done

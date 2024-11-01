@@ -14,13 +14,13 @@ Lab: Prof YU Keping's Lab
 
 ucr_data = [
     "CBF",
-    "ECG200",
-    "ECG5000",
-    "FordB",
-    "GunPointAgeSpan",
+    #"ECG200",
+    #"ECG5000",
+    #"FordB",
+    #"GunPointAgeSpan",
     #"ScreenType",
-    "Strawberry",
-    "Yoga",
+    #"Strawberry",
+    #"Yoga",
 ]
 
 techniques_groups = {

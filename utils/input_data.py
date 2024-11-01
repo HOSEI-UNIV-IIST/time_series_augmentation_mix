@@ -100,13 +100,28 @@ def get_datasets(args):
 
     # Normalize
     if args.normalize_input:
-        x_train_max = np.nanmax(x_train)
-        x_train_min = np.nanmin(x_train)
-        x_train = 2. * (x_train - x_train_min) / (x_train_max - x_train_min) - 1.
-        # Test is secret
-        x_test = 2. * (x_test - x_train_min) / (x_train_max - x_train_min) - 1.
+        if args.normalize_input_positive:
+            # Normalize to [0, 1]
+            x_train_max = np.nanmax(x_train)
+            x_train_min = np.nanmin(x_train)
+            x_train = (x_train - x_train_min) / (x_train_max - x_train_min)
+            # Ensure x_test uses the same scaling based on x_train's range
+            x_test = (x_test - x_train_min) / (x_train_max - x_train_min)
+        else:
+            x_train_max = np.nanmax(x_train)
+            x_train_min = np.nanmin(x_train)
+            x_train = 2. * (x_train - x_train_min) / (x_train_max - x_train_min) - 1.
+            # Test is secret
+            x_test = 2. * (x_test - x_train_min) / (x_train_max - x_train_min) - 1.
 
     x_train = np.nan_to_num(x_train)
     x_test = np.nan_to_num(x_test)
     return x_train, y_train, x_test, y_test
 
+
+def prepare_multi_step_data(x, y, n_steps):
+    x_seq, y_seq = [], []
+    for i in range(len(x) - n_steps):
+        x_seq.append(x[i])
+        y_seq.append(y[i:i + n_steps])
+    return np.array(x_seq), np.array(y_seq)
