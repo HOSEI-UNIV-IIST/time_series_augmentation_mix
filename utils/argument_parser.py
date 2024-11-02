@@ -21,8 +21,9 @@ def argument_parser():
     parser.add_argument('--gpus', type=int, default=1, help="Number of GPUs to use")
     parser.add_argument('--dataset', type=str, default='CBF', help='Name of dataset to test (required, ex: unipen1a)')
     parser.add_argument('--model', type=str, default="lstm1", help="Set model name")
-    parser.add_argument('--train', default=False, action="store_true", help="Train?")
+    parser.add_argument('--train', default=True, action="store_true", help="Train?")
     parser.add_argument('--save', default=True, action="store_true", help="Save to disk?")
+    parser.add_argument('--extension', type=str, default='txt', help="Dataset file extension")
     # Augmentation
     parser.add_argument('--augmentation_ratio', type=int, default=1, help="How many times to augment")
     parser.add_argument('--augmentation_method', type=str, default="simple",
@@ -89,7 +90,7 @@ def argument_parser():
     parser.add_argument('--log_dir', type=str, default="logs", help="Log path")
     parser.add_argument('--output_dir', type=str, default="output", help="Output path")
     parser.add_argument('--normalize_input', default=True, action="store_true", help="Normalize between [-1,1] or [0,1]")
-    parser.add_argument('--normalize_input_positive', default=False, action="store_true", help="Normalize between [0,1]")
+    parser.add_argument('--normalize_input_positive', default=True, action="store_true", help="Normalize between [0,1]")
     parser.add_argument('--delimiter', type=str, default=" ", help="Delimiter")
     # Network settings
     parser.add_argument('--optimizer', type=str, default="adam", help="Which optimizer")

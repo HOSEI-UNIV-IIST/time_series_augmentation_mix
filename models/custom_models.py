@@ -16,10 +16,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-def get_model(model_name, input_shape, nb_class, n_steps=10):
+def get_model(model_name, input_shape, nb_class=3, n_steps=10):
     if model_name == "lstm1":
-        model = SimpleLSTM1(input_shape, nb_class, n_steps=n_steps)
+        model = SimpleLSTM1(input_shape, n_steps=n_steps)
     elif model_name == "gru1":
         model = SimpleGRU1(input_shape, nb_class)
     elif model_name == "lstm2":
@@ -38,30 +37,36 @@ def get_model(model_name, input_shape, nb_class, n_steps=10):
 
 
 class SimpleLSTM1(nn.Module):
-    def __init__(self, input_shape, nb_class, n_steps=10):
+    def __init__(self, input_shape, n_steps=10):
         """
         Initializes an LSTM model for multi-step forecasting.
 
         Parameters:
-        - input_shape (tuple): Shape of the input data (timesteps, features).
-        - nb_class (int): Number of target classes or output steps.
+        - input_shape (tuple): Shape of the input data (look_back, num_features).
         - n_steps (int): Number of steps to predict ahead (forecast horizon).
         """
         super(SimpleLSTM1, self).__init__()
-        self.nb_dims = input_shape[1]
+
+        self.num_features = input_shape[1]  # Number of features in input data
         self.n_steps = n_steps
-        self.lstm = nn.LSTM(self.nb_dims, 100, batch_first=True)
-        self.fc = nn.Linear(100, nb_class * n_steps)
+
+        # Define LSTM layer
+        self.lstm = nn.LSTM(input_size=self.num_features, hidden_size=100, batch_first=True)
+
+        # Fully connected layer to map to desired output shape (n_steps)
+        self.fc = nn.Linear(100, n_steps)
 
     def forward(self, x):
-        # x shape: (batch, nb_timesteps, nb_dims)
-        out, (hn, cn) = self.lstm(x)  # LSTM output
-        out = out[:, -1, :]  # Take the output of the last timestep
-        out = self.fc(out)  # Pass through a linear layer
+        # LSTM layer
+        out, (hn, cn) = self.lstm(x)
 
-        # Reshape output to (batch, n_steps, nb_class)
-        out = out.view(-1, self.n_steps, self.fc.out_features // self.n_steps)
-        return torch.softmax(out, dim=2)  # Softmax to get probabilities over each step
+        # Use the output of the last timestep
+        out = out[:, -1, :]
+
+        # Fully connected layer for forecasting multiple steps ahead
+        out = self.fc(out)
+
+        return out
 
 # class SimpleLSTM1(nn.Module):
 #     def __init__(self, input_shape, nb_class):

@@ -50,8 +50,8 @@ def load_data_from_file(data_file, label_file=None, delimiter=" "):
             labels = labels[:,1]
     else:
         data = np.genfromtxt(data_file, delimiter=delimiter)
-        labels = data[:,0]
-        data = data[:,1:]
+        labels = data[1:,0]
+        data = data[1:,1:]
     return data, labels
     
 def read_data_sets(train_file, train_label=None, test_file=None, test_label=None, test_split=0.1, delimiter=" "):
@@ -70,25 +70,18 @@ def read_data_sets(train_file, train_label=None, test_file=None, test_label=None
 def get_datasets(args):
     # Load data
     if args.preset_files:
-        if args.dataset == 'CBF':
-            train_data_file = os.path.join(args.data_dir, args.dataset, "CBF_TRAIN.tsv")
-            test_data_file = os.path.join(args.data_dir, args.dataset, "CBF_TEST.tsv")
-            x_train, y_train, x_test, y_test = read_data_sets(train_data_file, "", test_data_file, "", delimiter="\t")
-        elif args.ucr:
-            train_data_file = os.path.join(args.data_dir, args.dataset, "%s_TRAIN.txt" % args.dataset)
-            test_data_file = os.path.join(args.data_dir, args.dataset, "%s_TEST.txt" % args.dataset)
-            x_train, y_train, x_test, y_test = read_data_sets(train_data_file, "", test_data_file, "", delimiter="")
-        elif args.ucr2018:
+        if args.extension == 'tsv':
             train_data_file = os.path.join(args.data_dir, args.dataset, "%s_TRAIN.tsv" % args.dataset)
             test_data_file = os.path.join(args.data_dir, args.dataset, "%s_TEST.tsv" % args.dataset)
             x_train, y_train, x_test, y_test = read_data_sets(train_data_file, "", test_data_file, "", delimiter="\t")
-        else:
-            x_train_file = os.path.join(args.data_dir, "train-%s-data.txt" % (args.dataset))
-            y_train_file = os.path.join(args.data_dir, "train-%s-labels.txt" % (args.dataset))
-            x_test_file = os.path.join(args.data_dir, "test-%s-data.txt" % (args.dataset))
-            y_test_file = os.path.join(args.data_dir, "test-%s-labels.txt" % (args.dataset))
-            x_train, y_train, x_test, y_test = read_data_sets(x_train_file, y_train_file, x_test_file, y_test_file,
-                                                              test_split=args.test_split, delimiter=args.delimiter)
+        elif args.extension == 'txt':
+            train_data_file = os.path.join(args.data_dir, args.dataset, "%s_TRAIN.txt" % args.dataset)
+            test_data_file = os.path.join(args.data_dir, args.dataset, "%s_TEST.txt" % args.dataset)
+            x_train, y_train, x_test, y_test = read_data_sets(train_data_file, "", test_data_file, "", delimiter=";")
+        elif args.extension == 'csv':
+            train_data_file = os.path.join(args.data_dir, args.dataset, "%s_TRAIN.csv" % args.dataset)
+            test_data_file = os.path.join(args.data_dir, args.dataset, "%s_TEST.csv" % args.dataset)
+            x_train, y_train, x_test, y_test = read_data_sets(train_data_file, "", test_data_file, "", delimiter="")
     else:
         x_train, y_train, x_test, y_test = read_data_sets(args.train_data_file, args.train_labels_file,
                                                           args.test_data_file, args.test_labels_file,
@@ -103,10 +96,16 @@ def get_datasets(args):
         if args.normalize_input_positive:
             # Normalize to [0, 1]
             x_train_max = np.nanmax(x_train)
+            y_train_max = np.nanmax(y_train)
+
             x_train_min = np.nanmin(x_train)
+            y_train_min = np.nanmin(y_train)
+
             x_train = (x_train - x_train_min) / (x_train_max - x_train_min)
+            y_train = (y_train - y_train_min) / (y_train_max - y_train_min)
             # Ensure x_test uses the same scaling based on x_train's range
             x_test = (x_test - x_train_min) / (x_train_max - x_train_min)
+            y_test = (y_test - y_train_min) / (y_train_max - y_train_min)
         else:
             x_train_max = np.nanmax(x_train)
             x_train_min = np.nanmin(x_train)

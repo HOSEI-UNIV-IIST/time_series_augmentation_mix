@@ -13,7 +13,8 @@ Lab: Prof YU Keping's Lab
 """
 
 ucr_data = [
-    "CBF",
+    "ELECTRICITY",
+    #"CBF",
     #"ECG200",
     #"ECG5000",
     #"FordB",
