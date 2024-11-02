@@ -29,9 +29,17 @@ import utils.datasets as ds
 from models import custom_models as mod, mix_augmentation_refined as aug
 from utils.argument_parser import argument_parser
 from utils.cache_loss_accuracy import CacheLossAccuracy
-from utils.input_data import get_datasets, prepare_multi_step_data
+from utils.input_data import get_datasets
 from utils.save_result import save_accuracy
 
+
+
+def prepare_multi_step_data(x, y, n_steps):
+    x_seq, y_seq = [], []
+    for i in range(len(x) - n_steps):
+        x_seq.append(x[i])
+        y_seq.append(y[i:i + n_steps])
+    return np.array(x_seq), np.array(y_seq)
 
 class Trainer:
     def __init__(self, args, n_steps=10):
@@ -224,59 +232,52 @@ class Trainer:
         accuracy = (100 * correct) / total
         return accuracy
 
-    def plot_predictions(self, num_samples=1):
+    def plot_validation_predictions(self, num_samples=100):
         """
-        Plots the historical data, look-back window, and multi-step forecast for a subset of test samples.
+        Plots a subset of true vs. predicted labels for the test set on a single plot.
 
         Parameters:
         num_samples (int): Number of samples to display in the plot.
         """
         self.model.eval()
+        true_labels = []
+        predicted_labels = []
 
+        # Collect predictions and true labels for the test set up to `num_samples`
+        collected_samples = 0
         with torch.no_grad():
             for data, labels in self.test_loader:
                 data, labels = data.to(self.device), labels.to(self.device)
 
-                # Get model output for the data
+                # Get model predictions
                 outputs = self.model(data)  # Shape: (batch_size, n_steps, nb_class)
-                predictions = torch.argmax(outputs, dim=2).cpu().numpy()  # Convert predictions to class indices
-                labels = torch.argmax(labels, dim=2).cpu().numpy()  # Convert true labels to class indices
+                predictions = torch.argmax(outputs, dim=2).cpu().numpy()  # Predicted labels
+                labels = torch.argmax(labels, dim=2).cpu().numpy()  # True labels
 
-                # Plot only the specified number of samples
-                for i in range(num_samples):
-                    # Get the historical data (input sequence) and forecasted data
-                    historical_data = data[i].cpu().numpy()
-                    true_future = labels[i]
-                    predicted_future = predictions[i]
+                # Flatten and accumulate data
+                for i in range(len(labels)):
+                    true_labels.extend(labels[i])
+                    predicted_labels.extend(predictions[i])
+                    collected_samples += 1
+                #     if collected_samples < num_samples:
+                #         true_labels.extend(labels[i])
+                #         predicted_labels.extend(predictions[i])
+                #         collected_samples += 1
+                #     else:
+                #         break
+                # if collected_samples >= num_samples:
+                #     break
 
-                    # Prepare indices for plotting
-                    look_back_length = historical_data.shape[0]
-                    forecast_length = self.n_steps
-                    total_length = look_back_length + forecast_length
+        # Plot true vs. predicted labels for the selected subset of the test set
+        plt.figure(figsize=(14, 8))
+        plt.plot(true_labels[-num_samples:], color="blue", label="True Labels", linewidth=1)
+        plt.plot(predicted_labels[-num_samples:], color="red", label="Predicted Labels", linestyle="--", linewidth=1)
 
-                    # Plot historical data
-                    plt.figure(figsize=(12, 6))
-                    plt.plot(range(look_back_length), historical_data[:, 0], color="blue",
-                             label="Historical Data (Target)")
-
-                    # Plot look-back window for prediction
-                    plt.plot(range(look_back_length - forecast_length, look_back_length),
-                             historical_data[-forecast_length:, 0], color="green",
-                             label=f"{forecast_length}-Day Look-Back Window")
-
-                    # Plot the multi-step forecast starting from the end of historical data
-                    forecast_indices = range(look_back_length, total_length)
-                    plt.plot(forecast_indices, predicted_future, linestyle="--", color="orange",
-                             label=f"{forecast_length}-Day Forecast")
-
-                    plt.xlabel("Day")
-                    plt.ylabel("Target Value")
-                    plt.title(
-                        f"{forecast_length}-Day Forecast for Target Variable with {forecast_length}-Day Look-Back Window")
-                    plt.legend()
-                    plt.show()
-
-                break  # Only plot for the first batch to avoid excessive plotting
+        plt.xlabel("Sample Index")
+        plt.ylabel("Class Label")
+        plt.title(f"True vs Predicted Labels for a Subset of Test Set (First {num_samples} Samples)")
+        plt.legend()
+        plt.show()
 
 
 if __name__ == '__main__':
@@ -303,4 +304,4 @@ if __name__ == '__main__':
                   f'{args.augmentation_ratio}_{args.dataset}_accuracies.json', 0)
 
     # Plot Predictions
-    trainer.plot_predictions(num_samples=2)
+    trainer.plot_validation_predictions(num_samples=100)
