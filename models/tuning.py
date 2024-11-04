@@ -12,11 +12,11 @@ Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
 
-# tuning.py
 import json
 import os
 import time
 import tracemalloc
+
 import optuna
 import yaml
 from optuna import Trial, pruners
@@ -59,16 +59,34 @@ class HyperparametersTuner:
         Returns:
         - float: Composite score based on validation loss and accuracy.
         """
-        # Sample hyperparameters for model and optimizer
+        # Sample hyperparameters based on the model type
         params = self.sample_hyperparameters(trial)
 
         # Initialize model and optimizer with suggested parameters
-        self.trainer.model = self.trainer.initialize_model(
-            hidden_size=params['hidden_size'],
-            n_layers=params['n_layers'],
-            num_filters=params['num_filters'],
-            kernel_size=params['kernel_size']
-        )
+        model_name = self.trainer.args.model
+        if model_name in ["cnn"]:
+            self.trainer.model = self.trainer.initialize_model(
+                num_filters=params['num_filters'],
+                kernel_size=params['kernel_size'],
+                pool_size=params['pool_size'],
+                dropout=params['dropout']
+            )
+        elif model_name in ["lstm", "gru"]:
+            self.trainer.model = self.trainer.initialize_model(
+                hidden_size=params['hidden_size'],
+                n_layers=params['n_layers'],
+                dropout=params['dropout']
+            )
+        else:  # Hybrid CNN-RNN models
+            self.trainer.model = self.trainer.initialize_model(
+                hidden_size=params['hidden_size'],
+                n_layers=params['n_layers'],
+                num_filters=params['num_filters'],
+                kernel_size=params['kernel_size'],
+                pool_size=params['pool_size'],
+                dropout=params['dropout']
+            )
+
         self.trainer.optimizer, self.trainer.scheduler = self.trainer.setup_optimizer_and_scheduler(
             learning_rate=params['learning_rate'],
             optimizer_type=params['optimizer'],
@@ -128,50 +146,80 @@ class HyperparametersTuner:
         model_name = self.trainer.args.model
         params_config = self.config.get(model_name, {})
 
-        # Sample hyperparameters based on the configuration
-        hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 150, 200]))
-        n_layers = trial.suggest_categorical('n_layers', params_config.get('n_layers', [1, 2, 3]))
-        num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 96, 128]))
-        kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [2, 3]))
+        # Sampling based on model type
+        if model_name == "cnn":
+            # Only sample CNN-specific parameters
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 128, 256]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [3, 5]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
 
-        # Common hyperparameters
-        learning_rate = trial.suggest_categorical('learning_rate', params_config.get('learning_rate', [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]))
-        optimizer = trial.suggest_categorical('optimizer', params_config.get('optimizer', ['adam', 'sgd', 'nadam']))
+            return {
+                'num_filters': num_filters,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name in ["lstm", "gru"]:
+            # Only sample RNN-specific parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 200]))
+            n_layers = trial.suggest_categorical('n_layers', params_config.get('n_layers', [1, 2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
+
+            return {
+                'hidden_size': hidden_size,
+                'n_layers': n_layers,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        else:
+            # Hybrid CNN-RNN models: sample all relevant parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 150]))
+            n_layers = trial.suggest_categorical('n_layers', params_config.get('n_layers', [1, 2]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [32, 64, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [3, 5]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
+
+            return {
+                'hidden_size': hidden_size,
+                'n_layers': n_layers,
+                'num_filters': num_filters,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+    def sample_common_hyperparameters(self, trial, params_config):
+        """Sample common hyperparameters for all models."""
+        learning_rate = trial.suggest_categorical('learning_rate',
+                                                  params_config.get('learning_rate', [1e-6, 1e-5, 1e-4, 1e-3]))
+        optimizer = trial.suggest_categorical('optimizer', params_config.get('optimizer', ['adam', 'sgd', 'rmsprop']))
         factor = trial.suggest_float('factor', *params_config.get('factor', [0.1, 0.5]))
-        patience = trial.suggest_int('patience', *params_config.get('patience', [40, 55]))
+        patience = trial.suggest_int('patience', *params_config.get('patience', [40, 50]))
 
         return {
-            'hidden_size': hidden_size,
-            'n_layers': n_layers,
-            'num_filters': num_filters,
-            'kernel_size': kernel_size,
             'learning_rate': learning_rate,
             'optimizer': optimizer,
-            'factor': factor,
+            'factor': round(factor, 2),
             'patience': patience
         }
 
     def tune_hyperparameters(self, n_trials=50):
-        """
-        Runs the hyperparameter optimization process using Optuna.
-
-        Parameters:
-        - n_trials (int): Number of trials for Optuna study.
-        """
+        """Runs the hyperparameter optimization process using Optuna."""
         study = optuna.create_study(direction="minimize", pruner=pruners.MedianPruner())
         study.optimize(self.objective, n_trials=n_trials)
 
         # Retrieve and save best parameters with additional metrics
-        best_params = study.best_trial.user_attrs["params"]  # Use full params dictionary
+        best_params = study.best_trial.user_attrs["params"]
         self.save_best_params(best_params)
 
     def save_best_params(self, best_params):
-        """
-        Saves the best hyperparameters and additional info to a JSON file.
-
-        Parameters:
-        - best_params (dict): Best parameters from Optuna study, with added metrics.
-        """
+        """Saves the best hyperparameters and additional info to a JSON file."""
         os.makedirs(self.trainer.best_params_dir, exist_ok=True)
         file_path = os.path.join(self.trainer.best_params_dir, f"{self.trainer.best_params_file_name}.json")
         with open(file_path, "w") as f:
@@ -179,12 +227,7 @@ class HyperparametersTuner:
         print(f"Best parameters saved to {file_path}")
 
     def load_best_params(self):
-        """
-        Loads the best hyperparameters from a JSON file.
-
-        Returns:
-        - dict: Dictionary of best hyperparameters.
-        """
+        """Loads the best hyperparameters from a JSON file."""
         file_path = os.path.join(self.trainer.best_params_dir, f"{self.trainer.best_params_file_name}.json")
         if os.path.exists(file_path):
             with open(file_path, "r") as f:

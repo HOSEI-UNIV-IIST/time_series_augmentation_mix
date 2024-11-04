@@ -14,6 +14,7 @@ Lab: Prof YU Keping's Lab
 
 import argparse
 
+
 def argument_parser():
     global args
     parser = argparse.ArgumentParser(description='Runs augmentation model.')
@@ -22,8 +23,9 @@ def argument_parser():
     parser.add_argument('--dataset', type=str, default='CBF', help='Name of dataset to test (required, ex: unipen1a)')
     parser.add_argument('--model', type=str, default="gru",
                         choices=[
-                            "cnn", "lstm", "gru", "cnn_lstm", "cnn_gru", "cnn_bigru", "cnn_bilstm",
-                            "gru_cnn_gru", "lstm_cnn_lstm", "bigru_cnn_bigru", "bilstm_cnn_bilstm"
+                            "cnn", "lstm", "gru", "cnn_lstm", "cnn_gru",
+                            "bigru_cnn_bigru", "bilstm_cnn_bilstm",
+                            "cnn_attention_bigru", "cnn_attention_bilstm",
                         ],
                         help="Set model name")
     parser.add_argument('--tune', default=False, action="store_true", help="Hyperparameters Tuner?")
@@ -95,7 +97,8 @@ def argument_parser():
     parser.add_argument('--weight_dir', type=str, default="weights", help="Weight path")
     parser.add_argument('--log_dir', type=str, default="logs", help="Log path")
     parser.add_argument('--output_dir', type=str, default="output", help="Output path")
-    parser.add_argument('--normalize_input', default=True, action="store_true", help="Normalize between [-1,1] or [0,1]")
+    parser.add_argument('--normalize_input', default=True, action="store_true",
+                        help="Normalize between [-1,1] or [0,1]")
     parser.add_argument('--normalize_input_positive', default=True, action="store_true", help="Normalize between [0,1]")
     parser.add_argument('--delimiter', type=str, default=" ", help="Delimiter")
     # Network settings
