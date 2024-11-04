@@ -54,7 +54,7 @@ aug_tech=('--jitter')
 for ratio in $(seq 1); do
   for dataset in $datasets; do
       for aug in "${aug_tech[@]}"; do
-          python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=$ratio --model=lstm1
+          python3 main.py --gpus=4 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=$ratio --model=lstm
       done
   done
 done

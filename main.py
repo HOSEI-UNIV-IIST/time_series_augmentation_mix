@@ -25,6 +25,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.utils.tensorboard import SummaryWriter
 
 from models import custom_models as mod, mix_augmentation_refined as aug
+from models.tuning import HyperparametersTuner
 from utils.argument_parser import argument_parser
 from utils.cache_loss_accuracy import CacheLossAccuracy
 from utils.input_data import get_datasets
@@ -75,7 +76,7 @@ class Trainer:
         self.test_loader = DataLoader(TensorDataset(self.x_test, self.y_test), batch_size=args.batch_size,
                                       shuffle=False)
 
-        self.model_prefix = f"{args.dataset}{self.augmentation_tags}"
+        self.model_prefix = f"{args.dataset}_{self.augmentation_tags}"
         # Create directories if they don't exist
         self.log_dir = os.path.join(args.log_dir, str(self.device), str(args.model), str(args.dataset),
                                     str(args.augmentation_ratio))
@@ -83,8 +84,11 @@ class Trainer:
                                        str(args.augmentation_ratio))
         self.output_dir = os.path.join(args.output_dir, str(self.device), str(args.model), str(args.dataset),
                                        str(args.augmentation_ratio))
+        # Directory and filename setup for best parameters
         self.best_params_dir = os.path.join(args.output_dir, str(self.device), str(args.model), str(args.dataset),
-                                            "hyperband")
+                                            str(args.augmentation_ratio))
+        self.best_params_file_name = f"{args.dataset}_back{self.look_back}_step{self.n_steps}"
+
         if not os.path.exists(self.weight_dir):
             os.makedirs(self.weight_dir)
 
@@ -100,23 +104,23 @@ class Trainer:
     def load_and_prepare_data(self):
         x_train_, y_train_, x_test_, y_test_ = get_datasets(self.args)
 
-        # Prepare data for multi-step forecasting
-        x_train, y_train = prepare_multi_step_data(x_train_, y_train_, self.look_back, self.n_steps)
-        x_test, y_test = prepare_multi_step_data(x_test_, y_test_, self.look_back, self.n_steps)
-
-        # Augment data
+        # Augment data before slicing windows
         if args.original:
             augmentation_tags = '_original'
             duration = 0
         else:
             print(f"Augmentation method: {args.augmentation_method}")
             started_at = time.time() * 1000  # Convert to milliseconds
-            x_train, y_train, augmentation_tags = aug.run_augmentation_refined(x_train, y_train, args)
+            x_train, y_train, augmentation_tags = aug.run_augmentation_refined(x_train_, y_train_, args)
             ended_at = time.time() * 1000  # Convert to milliseconds
             duration = ended_at - started_at
             print(f"Augmentation process took {duration:.2f} ms")
             print(
                 f"x_train shape after augmentation: {x_train.shape}, y_train shape after augmentation: {y_train.shape}")
+
+        # Prepare data for multi-step forecasting after augmentation
+        x_train, y_train = prepare_multi_step_data(x_train_, y_train_, self.look_back, self.n_steps)
+        x_test, y_test = prepare_multi_step_data(x_test_, y_test_, self.look_back, self.n_steps)
 
         # Convert to tensors and check shapes
         x_train = torch.tensor(x_train, dtype=torch.float32)
@@ -129,9 +133,10 @@ class Trainer:
 
         return x_train, y_train, x_test, y_test, augmentation_tags, duration
 
-    def initialize_model(self):
+    def initialize_model(self, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3):
         # Initialize the model using automatically inferred input_shape and n_steps
-        model = mod.get_model(self.args.model, self.input_shape, n_steps=self.n_steps).to(self.device)
+        model = mod.get_model(self.args.model, self.input_shape, n_steps=self.n_steps, hidden_size=hidden_size,
+                              n_layers=n_layers, num_filters=num_filters, kernel_size=kernel_size).to(self.device)
         return self.wrap_model_with_dataparallel(model)
 
     def wrap_model_with_dataparallel(self, model):
@@ -139,18 +144,18 @@ class Trainer:
             model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
         return model.to(self.device)
 
-    def setup_optimizer_and_scheduler(self):
-        if self.args.optimizer == "adam":
-            optimizer = optim.Adam(self.model.parameters(), lr=self.args.lr)
-        elif self.args.optimizer == "nadam":
-            optimizer = optim.NAdam(self.model.parameters(), lr=self.args.lr)
-        elif self.args.optimizer == "adadelta":
-            optimizer = optim.Adadelta(self.model.parameters(), lr=self.args.lr, rho=0.95, eps=1e-8)
+    def setup_optimizer_and_scheduler(self, learning_rate=1e-3, optimizer_type='adam', factor=0.1, patience=10):
+        if optimizer_type == "adam":
+            optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+        elif optimizer_type == "nadam":
+            optimizer = optim.NAdam(self.model.parameters(), lr=learning_rate)
+        elif optimizer_type == "adadelta":
+            optimizer = optim.Adadelta(self.model.parameters(), lr=learning_rate, rho=0.95, eps=1e-8)
         else:
-            optimizer = optim.SGD(self.model.parameters(), lr=self.args.lr, weight_decay=5e-4, momentum=0.9)
+            optimizer = optim.SGD(self.model.parameters(), lr=learning_rate, weight_decay=5e-4, momentum=0.9)
         n_epochs = int(np.ceil(self.args.iterations * (self.args.batch_size / self.x_train.shape[0])))
-        scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=int(np.ceil(n_epochs / 30.)),
-                                      min_lr=1e-5, cooldown=int(np.ceil(n_epochs / 40.)))
+        scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=factor, patience=patience,
+                                      min_lr=1e-7, cooldown=int(np.ceil(n_epochs / 40.)))
 
         return optimizer, scheduler
 
@@ -163,7 +168,7 @@ class Trainer:
         best_val_loss = float('inf')
         if args.model == "fcnn":
             early_stopping_patience = 100
-        elif args.model in ["lstm1", "lstm2", "gru1", "gru2"]:
+        elif args.model in ["lstm", "gru"]:
             early_stopping_patience = 100
         else:
             early_stopping_patience = 20
@@ -329,6 +334,27 @@ if __name__ == '__main__':
     look_back = 7  # Number of past timesteps to consider as input
     n_steps = 3  # Number of steps ahead to predict
     trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+
+    tuner = HyperparametersTuner(trainer)
+
+    if args.tune:
+        # Update Trainer with best hyperparameters
+        print("Starting hyperparameter tuning...")
+        tuner.tune_hyperparameters(n_trials=5)
+        best_params = tuner.load_best_params()
+        trainer.model = trainer.initialize_model(
+            hidden_size=best_params.get('hidden_size', 100),
+            n_layers=best_params.get('n_layers', 1),
+            num_filters=best_params.get('num_filters', 64),
+            kernel_size=best_params.get('kernel_size', 3)
+        )
+
+        trainer.optimizer, trainer.scheduler = trainer.setup_optimizer_and_scheduler(
+            learning_rate=best_params['learning_rate'],
+            optimizer_type=best_params['optimizer'],
+            factor=best_params['factor'],
+            patience=best_params['patience']
+        )
 
     nb_iterations = args.iterations
     nb_epochs = int(np.ceil(nb_iterations * (args.batch_size / trainer.x_train.shape[0])))
