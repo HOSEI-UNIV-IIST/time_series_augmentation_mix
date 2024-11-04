@@ -11,6 +11,8 @@ Univ: Hosei University
 Dept: Science and Engineering
 Lab: Prof YU Keping's Lab
 """
+
+# main.py
 import os
 import time
 
@@ -66,6 +68,8 @@ class Trainer:
         # Initialize model
         self.model = self.initialize_model()
         self.optimizer, self.scheduler = self.setup_optimizer_and_scheduler()
+        nb_iterations = self.args.iterations
+        self.nb_epochs = int(np.ceil(args.iterations * (args.batch_size / self.x_train.shape[0])))
 
         # Set loss function
         self.criterion = nn.MSELoss()
@@ -340,7 +344,7 @@ if __name__ == '__main__':
     if args.tune:
         # Update Trainer with best hyperparameters
         print("Starting hyperparameter tuning...")
-        tuner.tune_hyperparameters(n_trials=5)
+        tuner.tune_hyperparameters(n_trials=2)
         best_params = tuner.load_best_params()
         trainer.model = trainer.initialize_model(
             hidden_size=best_params.get('hidden_size', 100),
@@ -356,11 +360,8 @@ if __name__ == '__main__':
             patience=best_params['patience']
         )
 
-    nb_iterations = args.iterations
-    nb_epochs = int(np.ceil(nb_iterations * (args.batch_size / trainer.x_train.shape[0])))
-
     if args.train:
-        val_losses, val_accuracies = trainer.train_and_validate(nb_epochs)
+        val_losses, val_accuracies = trainer.train_and_validate(trainer.nb_epochs)
         if args.save:
             torch.save(trainer.model.state_dict(),
                        os.path.join(trainer.weight_dir, f"{trainer.model_prefix}_final_weights.pth"))
@@ -369,6 +370,7 @@ if __name__ == '__main__':
             cache.plot_training_data()
 
     print("Evaluation")
+
     # Run evaluation and retrieve metrics
     accuracies = trainer.evaluate()
 

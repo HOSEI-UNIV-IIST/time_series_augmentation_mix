@@ -21,8 +21,10 @@ def argument_parser():
     parser.add_argument('--gpus', type=int, default=1, help="Number of GPUs to use")
     parser.add_argument('--dataset', type=str, default='CBF', help='Name of dataset to test (required, ex: unipen1a)')
     parser.add_argument('--model', type=str, default="gru",
-                        choices=["cnn", "cnn_lstm", "cnn_gru", "cnn_bilstm", "cnn_bigru", "gru_cnn_gru",
-                                 "bilstm_cnn_bilstm", "bigru_cnn_bigru", "lstm_cnn_lstm"],
+                        choices=[
+                            "cnn", "lstm", "gru", "cnn_lstm", "cnn_gru", "cnn_bigru", "cnn_bilstm",
+                            "gru_cnn_gru", "lstm_cnn_lstm", "bigru_cnn_bigru", "bilstm_cnn_bilstm"
+                        ],
                         help="Set model name")
     parser.add_argument('--tune', default=False, action="store_true", help="Hyperparameters Tuner?")
     parser.add_argument('--train', default=True, action="store_true", help="Train?")
