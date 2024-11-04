@@ -103,7 +103,7 @@ def argument_parser():
     parser.add_argument('--lr', type=float, default=1e-3, help="Learning Rate")
     parser.add_argument('--validation_split', type=int, default=0, help="Size of validation set")
     parser.add_argument('--iterations', type=int, default=10000, help="Number of iterations")
-    parser.add_argument('--batch_size', type=int, default=256, help="Batch size")
+    parser.add_argument('--batch_size', type=int, default=64, help="Batch size")
     parser.add_argument('--verbose', type=int, default=2, help="Verbose")
     args = parser.parse_args()
     return args
