@@ -326,13 +326,15 @@ class FlexibleCNN_Attention_BiGRU(nn.Module):
         for _ in range(n_layers):
             kernel_size = min(kernel_size, output_dim)
             effective_pool_size = min(pool_size, output_dim)
+
             layers += [
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
+
             in_channels = num_filters
             num_filters *= 2
             output_dim = (output_dim + 1) // effective_pool_size
@@ -340,11 +342,19 @@ class FlexibleCNN_Attention_BiGRU(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        # Pass through CNN layers
         x = self.cnn_layers(x.transpose(1, 2)).transpose(1, 2)
+
+        # Attention mechanism
         attn_output, _ = self.attention(x, x, x)
+
+        # Bidirectional GRU
         _, hn = self.bigru(attn_output)
+
+        # Concatenate hidden states from both directions
         out = torch.cat((hn[-2], hn[-1]), dim=1)
         return self.fc(out)
+
 
 
 class FlexibleCNN_Attention_BiLSTM(nn.Module):
@@ -373,7 +383,7 @@ class FlexibleCNN_Attention_BiLSTM(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters

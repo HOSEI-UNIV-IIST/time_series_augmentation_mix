@@ -26,7 +26,7 @@ from utils.save_result import save_accuracy
 if __name__ == '__main__':
     args = argument_parser()
     look_back = 7
-    n_steps = 3
+    n_steps = 2
     trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
 
     tuner = HyperparametersTuner(trainer, accuracy_weight=0.5, loss_weight=0.5,
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     if args.tune:
         print("Starting hyperparameter tuning...")
-        tuner.tune_hyperparameters(n_trials=2)
+        tuner.tune_hyperparameters(n_trials=1)
         best_params = tuner.load_best_params()
         trainer.model = trainer.initialize_model(
             hidden_size=best_params.get('hidden_size', 100),
@@ -72,8 +72,16 @@ if __name__ == '__main__':
           f"RMSE: {accuracies['rmse']:.4f}, "
           f"MAPE: {accuracies['mape']:.4f}")
 
-    file_name = f"{args.augmentation_ratio}_{args.dataset}_accuracies.json"
+    file_name = f"{trainer.augmentation_tags}_accuracies.json"
     save_accuracy(accuracies, f"{args.dataset}_{trainer.augmentation_tags}", trainer.output_dir, file_name,
                   trainer.duration)
 
     trainer.plot_validation_predictions(num_samples=100)
+    #trainer.plot_realtime_predictions(num_samples=100)
+
+    # SHAPE OR LIME for  INTERPRETATION
+    if args.interpret:
+        print("Interpreting predictions with SHAP or LIME...")
+        trainer.interpret_predictions_bar(samples=10, method=args.interpret_method)
+        trainer.interpret_predictions_line(samples=50, method=args.interpret_method)
+

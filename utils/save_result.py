@@ -3,8 +3,9 @@ import os
 
 
 def save_accuracy(accuracies, tag, save_path, file_name, duration):
-    os.makedirs(save_path, exist_ok=True)
-    file_path = os.path.join(save_path, file_name)
+    save_dir = os.path.join(save_path, "val_accu")
+    os.makedirs(save_dir, exist_ok=True)
+    file_path = os.path.join(save_dir, file_name)
 
     # Load existing data if file exists
     if os.path.exists(file_path):

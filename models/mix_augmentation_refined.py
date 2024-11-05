@@ -63,7 +63,7 @@ def run_augmentation_refined(x, y, args):
         print(f"Augmentation done: {augmentation_tags + temp_tags}")
 
         # Update augmentation tags
-        augmentation_tags = f"{args.extra_tag}_{temp_tags}" if args.extra_tag else f"{initial_tags}{temp_tags}"
+        augmentation_tags = f"{args.extra_tag}_{temp_tags}" if args.extra_tag else temp_tags
     else:
         x_aug, y_aug = x, y  # No augmentation, just return original data
         augmentation_tags = args.extra_tag
@@ -178,7 +178,7 @@ def ads_magnitude_uniq1(x, y, ratio=1):
     x_combined = aug.jitter(x_combined)
     x_combined = aug.jitter(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_uniq1_{ratio}x"
+    augmentation_tags = f"ads_magnitude_uniq1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -192,7 +192,7 @@ def ads_magnitude_uniq2(x, y, ratio=1):
     x_combined = aug.rotation(x_combined)
     x_combined = aug.rotation(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_uniq2_{ratio}x"
+    augmentation_tags = f"ads_magnitude_uniq2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -206,7 +206,7 @@ def ads_magnitude_uniq3(x, y, ratio=1):
     x_combined = aug.scaling(x_combined)
     x_combined = aug.scaling(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_uniq3_{ratio}x"
+    augmentation_tags = f"ads_magnitude_uniq3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -220,7 +220,7 @@ def ads_magnitude_uniq4(x, y, ratio=1):
     x_combined = aug.magnitude_warp(x_combined)
     x_combined = aug.magnitude_warp(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_uniq4_{ratio}x"
+    augmentation_tags = f"ads_magnitude_uniq4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -237,7 +237,7 @@ def ads_magnitude_multi1(x, y, ratio=1):
     x_combined = aug.magnitude_warp(x_combined)
     x_combined = aug.jitter(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_multi1_{ratio}x"
+    augmentation_tags = f"ads_magnitude_multi1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -251,7 +251,7 @@ def ads_magnitude_multi2(x, y, ratio=1):
     x_combined = aug.jitter(x_combined)
     x_combined = aug.scaling(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_multi2_{ratio}x"
+    augmentation_tags = f"ads_magnitude_multi2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -265,7 +265,7 @@ def ads_magnitude_multi3(x, y, ratio=1):
     x_combined = aug.scaling(x_combined)
     x_combined = aug.rotation(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_multi3_{ratio}x"
+    augmentation_tags = f"ads_magnitude_multi3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -279,7 +279,7 @@ def ads_magnitude_multi4(x, y, ratio=1):
     x_combined = aug.rotation(x_combined)
     x_combined = aug.magnitude_warp(x_combined)
 
-    augmentation_tags = f"_ads_magnitude_multi4_{ratio}x"
+    augmentation_tags = f"ads_magnitude_multi4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -296,7 +296,7 @@ def ads_time_uniq1(x, y, ratio=1):
     x_combined = aug.permutation(x_combined)
     x_combined = aug.permutation(x_combined)
 
-    augmentation_tags = f"_ads_time_uniq1_{ratio}x"
+    augmentation_tags = f"ads_time_uniq1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -310,7 +310,7 @@ def ads_time_uniq2(x, y, ratio=1):
     x_combined = aug.window_slice(x_combined)
     x_combined = aug.window_slice(x_combined)
 
-    augmentation_tags = f"_ads_time_uniq2_{ratio}x"
+    augmentation_tags = f"ads_time_uniq2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -324,7 +324,7 @@ def ads_time_uniq3(x, y, ratio=1):
     x_combined = aug.time_warp(x_combined)
     x_combined = aug.time_warp(x_combined)
 
-    augmentation_tags = f"_ads_time_uniq3_{ratio}x"
+    augmentation_tags = f"ads_time_uniq3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -338,7 +338,7 @@ def ads_time_uniq4(x, y, ratio=1):
     x_combined = aug.window_warp(x_combined)
     x_combined = aug.window_warp(x_combined)
 
-    augmentation_tags = f"_ads_time_uniq4_{ratio}x"
+    augmentation_tags = f"ads_time_uniq4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -355,7 +355,7 @@ def ads_time_multi1(x, y, ratio=1):
     x_combined = aug.time_warp(x_combined)
     x_combined = aug.window_warp(x_combined)
 
-    augmentation_tags = f"_ads_time_multi1_{ratio}x"
+    augmentation_tags = f"ads_time_multi1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -369,7 +369,7 @@ def ads_time_multi2(x, y, ratio=1):
     x_combined = aug.window_warp(x_combined)
     x_combined = aug.permutation(x_combined)
 
-    augmentation_tags = f"_ads_time_multi2_{ratio}x"
+    augmentation_tags = f"ads_time_multi2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -383,7 +383,7 @@ def ads_time_multi3(x, y, ratio=1):
     x_combined = aug.permutation(x_combined)
     x_combined = aug.window_slice(x_combined)
 
-    augmentation_tags = f"_ads_time_multi3_{ratio}x"
+    augmentation_tags = f"ads_time_multi3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -397,7 +397,7 @@ def ads_time_multi4(x, y, ratio=1):
     x_combined = aug.window_slice(x_combined)
     x_combined = aug.time_warp(x_combined)
 
-    augmentation_tags = f"_ads_time_multi4_{ratio}x"
+    augmentation_tags = f"ads_time_multi4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -425,7 +425,7 @@ def adp_magnitude_uniq1(x, y, ratio=1):
     x_combined = np.concatenate([np.tile(x_jitter, (ratio, 1)), x_split[1], x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([np.tile(y_split[0], ratio), y_split[1], y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq1_{ratio}x"
+    augmentation_tags = f"adp_magnitude_uniq1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -439,7 +439,7 @@ def adp_magnitude_uniq2(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], np.tile(x_rotation, (ratio, 1)), x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], np.tile(y_split[1], ratio), y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq2_{ratio}x"
+    augmentation_tags = f"adp_magnitude_uniq2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -453,7 +453,7 @@ def adp_magnitude_uniq3(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], np.tile(x_scaling, (ratio, 1)), x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], np.tile(y_split[2], ratio), y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq3_{ratio}x"
+    augmentation_tags = f"adp_magnitude_uniq3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -467,7 +467,7 @@ def adp_magnitude_uniq4(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], x_split[2], np.tile(x_magnitude_warp, (ratio, 1))], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], y_split[2], np.tile(y_split[3], ratio)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_uniq4_{ratio}x"
+    augmentation_tags = f"adp_magnitude_uniq4"
     return x_combined, y_combined, augmentation_tags
 
 # ————————————————————————————————————————————————————————
@@ -492,7 +492,7 @@ def adp_magnitude_multi1(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi1_{ratio}x"
+    augmentation_tags = f"adp_magnitude_multi1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -514,7 +514,7 @@ def adp_magnitude_multi2(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi2_{ratio}x"
+    augmentation_tags = f"adp_magnitude_multi2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -536,7 +536,7 @@ def adp_magnitude_multi3(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi3_{ratio}x"
+    augmentation_tags = f"adp_magnitude_multi3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -558,7 +558,7 @@ def adp_magnitude_multi4(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_magnitude_multi4_{ratio}x"
+    augmentation_tags = f"adp_magnitude_multi4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -579,7 +579,7 @@ def adp_time_uniq1(x, y, ratio=1):
     x_combined = np.concatenate([np.tile(x_permutation, (ratio, 1)), x_split[1], x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([np.tile(y_split[0], ratio), y_split[1], y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq1_{ratio}x"
+    augmentation_tags = f"adp_time_uniq1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -593,7 +593,7 @@ def adp_time_uniq2(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], np.tile(x_window_slice, (ratio, 1)), x_split[2], x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], np.tile(y_split[1], ratio), y_split[2], y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq2_{ratio}x"
+    augmentation_tags = f"adp_time_uniq2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -607,7 +607,7 @@ def adp_time_uniq3(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], np.tile(x_time_warp, (ratio, 1)), x_split[3]], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], np.tile(y_split[2], ratio), y_split[3]], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq3_{ratio}x"
+    augmentation_tags = f"adp_time_uniq3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -621,7 +621,7 @@ def adp_time_uniq4(x, y, ratio=1):
     x_combined = np.concatenate([x_split[0], x_split[1], x_split[2], np.tile(x_window_warp, (ratio, 1))], axis=0)
     y_combined = np.concatenate([y_split[0], y_split[1], y_split[2], np.tile(y_split[3], ratio)], axis=0)
 
-    augmentation_tags = f"_adp_time_uniq4_{ratio}x"
+    augmentation_tags = f"adp_time_uniq4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -647,7 +647,7 @@ def adp_time_multi1(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi1_{ratio}x"
+    augmentation_tags = f"adp_time_multi1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -669,7 +669,7 @@ def adp_time_multi2(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi2_{ratio}x"
+    augmentation_tags = f"adp_time_multi2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -691,7 +691,7 @@ def adp_time_multi3(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi3_{ratio}x"
+    augmentation_tags = f"adp_time_multi3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -713,7 +713,7 @@ def adp_time_multi4(x, y, ratio=1):
 
     y_combined = np.concatenate([np.tile(y_split[i], ratio) for i in range(4)], axis=0)
 
-    augmentation_tags = f"_adp_time_multi4_{ratio}x"
+    augmentation_tags = f"adp_time_multi4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -737,7 +737,7 @@ def ads_sequential_combined1(x, y, ratio=1):
     x_combined = aug.time_warp(x_combined)
     x_combined = aug.scaling(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined1_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -753,7 +753,7 @@ def ads_sequential_combined2(x, y, ratio=1):
     x_combined = aug.time_warp(x_combined)
     x_combined = aug.magnitude_warp(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined2_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -769,7 +769,7 @@ def ads_sequential_combined3(x, y, ratio=1):
     x_combined = aug.window_slice(x_combined)
     x_combined = aug.rotation(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined3_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -785,7 +785,7 @@ def ads_sequential_combined4(x, y, ratio=1):
     x_combined = aug.window_slice(x_combined)
     x_combined = aug.jitter(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined4_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -801,7 +801,7 @@ def ads_sequential_combined5(x, y, ratio=1):
     x_combined = aug.window_warp(x_combined)
     x_combined = aug.scaling(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined5_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined5"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -817,7 +817,7 @@ def ads_sequential_combined6(x, y, ratio=1):
     x_combined = aug.time_warp(x_combined)
     x_combined = aug.magnitude_warp(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined6_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined6"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -833,7 +833,7 @@ def ads_sequential_combined7(x, y, ratio=1):
     x_combined = aug.window_warp(x_combined)
     x_combined = aug.jitter(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined7_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined7"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -849,7 +849,7 @@ def ads_sequential_combined8(x, y, ratio=1):
     x_combined = aug.window_warp(x_combined)
     x_combined = aug.scaling(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined8_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined8"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -865,7 +865,7 @@ def ads_sequential_combined9(x, y, ratio=1):
     x_combined = aug.window_warp(x_combined)
     x_combined = aug.magnitude_warp(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined9_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined9"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -881,7 +881,7 @@ def ads_sequential_combined10(x, y, ratio=1):
     x_combined = aug.window_slice(x_combined)
     x_combined = aug.rotation(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined10_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined10"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -897,7 +897,7 @@ def ads_sequential_combined11(x, y, ratio=1):
     x_combined = aug.window_slice(x_combined)
     x_combined = aug.magnitude_warp(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined11_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined11"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -913,7 +913,7 @@ def ads_sequential_combined12(x, y, ratio=1):
     x_combined = aug.time_warp(x_combined)
     x_combined = aug.rotation(x_combined)
 
-    augmentation_tags = f"_ads_sequential_combined12_{ratio}x"
+    augmentation_tags = f"ads_sequential_combined12"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -951,7 +951,7 @@ def adp_parallel_combined1(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined1_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -977,7 +977,7 @@ def adp_parallel_combined2(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined2_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1003,7 +1003,7 @@ def adp_parallel_combined3(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined3_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1029,7 +1029,7 @@ def adp_parallel_combined4(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined4_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1055,7 +1055,7 @@ def adp_parallel_combined5(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined5_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined5"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1081,7 +1081,7 @@ def adp_parallel_combined6(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined6_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined6"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1107,7 +1107,7 @@ def adp_parallel_combined7(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined7_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined7"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1133,7 +1133,7 @@ def adp_parallel_combined8(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined8_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined8"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1159,7 +1159,7 @@ def adp_parallel_combined9(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined9_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined9"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1185,7 +1185,7 @@ def adp_parallel_combined10(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined10_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined10"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1211,7 +1211,7 @@ def adp_parallel_combined11(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined11_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined11"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1237,5 +1237,5 @@ def adp_parallel_combined12(x, y, ratio=1):
         np.tile(y_split[i], ratio) for i in range(4)
     ])
 
-    augmentation_tags = f"_adp_parallel_combined12_{ratio}x"
+    augmentation_tags = f"adp_parallel_combined12"
     return x_combined, y_combined, augmentation_tags
