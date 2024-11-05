@@ -14,7 +14,6 @@ Lab: Prof YU Keping's Lab
 
 # training.py
 
-
 import csv
 # main.py
 import os
