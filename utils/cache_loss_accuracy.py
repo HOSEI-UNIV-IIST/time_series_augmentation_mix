@@ -13,8 +13,9 @@ Lab: Prof YU Keping's Lab
 """
 
 import os
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class CacheLossAccuracy:
@@ -24,19 +25,23 @@ class CacheLossAccuracy:
         self.output_dir = output_dir
         self.model_prefix = model_prefix
 
+        # Ensure required directories exist
+        os.makedirs(os.path.join(self.output_dir, 'accu_loss_npy'), exist_ok=True)
+        os.makedirs(os.path.join(self.output_dir, 'accu_loss_img'), exist_ok=True)
+
     def save_training_data(self):
         # Save loss data
-        loss_file = os.path.join(self.output_dir, f"{self.model_prefix}_losses.npy")
+        loss_file = os.path.join(self.output_dir, 'accu_loss_npy', f"{self.model_prefix}_losses.npy")
         np.save(loss_file, np.array(self.losses))
 
         # Save accuracy data
-        accuracy_file = os.path.join(self.output_dir, f"{self.model_prefix}_accuracies.npy")
+        accuracy_file = os.path.join(self.output_dir, 'accu_loss_npy', f"{self.model_prefix}_accuracies.npy")
         np.save(accuracy_file, np.array(self.accuracies))
 
     def plot_training_data(self):
         # Load loss and accuracy data
-        losses = np.load(os.path.join(self.output_dir, f"{self.model_prefix}_losses.npy"))
-        accuracies = np.load(os.path.join(self.output_dir, f"{self.model_prefix}_accuracies.npy"))
+        losses = np.load(os.path.join(self.output_dir, 'accu_loss_npy', f"{self.model_prefix}_losses.npy"))
+        accuracies = np.load(os.path.join(self.output_dir, 'accu_loss_npy', f"{self.model_prefix}_accuracies.npy"))
 
         # Plot loss data
         plt.figure()
@@ -45,7 +50,8 @@ class CacheLossAccuracy:
         plt.ylabel("Loss")
         plt.title("Training Loss")
         plt.legend()
-        plt.savefig(os.path.join(self.output_dir, f"{self.model_prefix}_loss_plot.png"))
+        plt.savefig(os.path.join(self.output_dir, 'accu_loss_img', f"{self.model_prefix}_loss_plot.png"))
+        plt.close()  # Close the figure to free memory
 
         # Plot accuracy data
         plt.figure()
@@ -54,4 +60,5 @@ class CacheLossAccuracy:
         plt.ylabel("Accuracy")
         plt.title("Training Accuracy")
         plt.legend()
-        plt.savefig(os.path.join(self.output_dir, f"{self.model_prefix}_accuracy_plot.png"))
+        plt.savefig(os.path.join(self.output_dir, 'accu_loss_img', f"{self.model_prefix}_accuracy_plot.png"))
+        plt.close()  # Close the figure to free memory
