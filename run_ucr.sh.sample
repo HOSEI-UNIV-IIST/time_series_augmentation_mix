@@ -53,6 +53,6 @@ aug_tech=('--original' '--jitter' '--scaling' '--permutation' '--randompermutati
 # Loop over each dataset and augmentation technique and run the Python script
 for dataset in $datasets; do
     for aug in "${aug_tech[@]}"; do
-        python3 main.py --gpus=5 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=4 --model=lstm1
+        python3 main.py --gpus=5 --data_dir=data/UCR --dataset="$dataset" --preset_files --ucr --normalize_input --train --save $aug=True --augmentation_ratio=4 --model=lstm
     done
 done

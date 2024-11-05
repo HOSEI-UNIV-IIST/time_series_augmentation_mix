@@ -63,7 +63,7 @@ def run_augmentation_refined(x, y, args):
         print(f"Augmentation done: {augmentation_tags + temp_tags}")
 
         # Update augmentation tags
-        augmentation_tags = f"{initial_tags}_{args.extra_tag}_{temp_tags}" if args.extra_tag else f"{initial_tags}{temp_tags}"
+        augmentation_tags = f"{args.extra_tag}_{temp_tags}" if args.extra_tag else f"{initial_tags}{temp_tags}"
     else:
         x_aug, y_aug = x, y  # No augmentation, just return original data
         augmentation_tags = args.extra_tag
