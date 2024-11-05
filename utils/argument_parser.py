@@ -30,6 +30,10 @@ def argument_parser():
                         help="Set model name")
     parser.add_argument('--tune', default=False, action="store_true", help="Hyperparameters Tuner?")
     parser.add_argument('--train', default=True, action="store_true", help="Train?")
+    parser.add_argument('--interpret', default=True, action='store_true',
+                        help="Flag to perform interpretation after evaluation.")
+    parser.add_argument('--interpret_method', type=str, default="shap", choices=["shap", "lime"],
+                        help="Choose interpretation method (shap or lime).")
     parser.add_argument('--save', default=True, action="store_true", help="Save to disk?")
     parser.add_argument('--extension', type=str, default='txt', help="Dataset file extension")
     # Augmentation

@@ -23,6 +23,7 @@ import optuna
 import yaml
 from optuna import Trial, pruners
 
+
 class HyperparametersTuner:
     def __init__(self, trainer, accuracy_weight=0.5, loss_weight=0.5, config_path="config/hyperparameters.yml"):
         """
@@ -221,15 +222,16 @@ class HyperparametersTuner:
 
     def save_best_params(self, best_params):
         """Saves the best hyperparameters and additional info to a JSON file."""
-        os.makedirs(self.trainer.best_params_dir, exist_ok=True)
-        file_path = os.path.join(self.trainer.best_params_dir, f"{self.trainer.best_params_file_name}.json")
+        file_dir = os.path.join(self.trainer.best_params_dir, "params")
+        os.makedirs(file_dir, exist_ok=True)
+        file_path = os.path.join(file_dir, f"{self.trainer.best_params_file_name}.json")
         with open(file_path, "w") as f:
             json.dump(best_params, f, indent=4)
         print(f"Best parameters saved to {file_path}")
 
     def load_best_params(self):
         """Loads the best hyperparameters from a JSON file."""
-        file_path = os.path.join(self.trainer.best_params_dir, f"{self.trainer.best_params_file_name}.json")
+        file_path = os.path.join(self.trainer.best_params_dir, "params", f"{self.trainer.best_params_file_name}.json")
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
                 best_params = json.load(f)

@@ -2,7 +2,7 @@ cnn:
   num_filters: [64, 128]
   kernel_size: [3, 5]
   pool_size: [2, 3]
-  learning_rate: [0.0001]
+  learning_rate: [0.0001, 0.0001]
   optimizer: ['adam']
   factor: [0.1, 0.5]
   patience: [45, 60]
@@ -11,7 +11,7 @@ cnn:
 lstm:
   hidden_size: [50, 100]
   n_layers: [1, 2, 3]
-  learning_rate: [0.0001]
+  learning_rate: [0.0001,0.001]
   optimizer: ['adam']
   factor: [0.1, 0.4]
   patience: [45, 60]
@@ -20,11 +20,11 @@ lstm:
 gru:
   hidden_size: [50, 100]
   n_layers: [1, 2]
-  learning_rate: [0.0001]
+  learning_rate: [0.0001,0.001]
   optimizer: ['adam']
-  factor: [0.2]
+  factor: [0.2, 0.3]
   patience: [30, 40]
-  dropout: [0.2]
+  dropout: [0.2, 0.3]
 
 cnn_lstm:
   hidden_size: [50, 100]
@@ -48,7 +48,7 @@ cnn_gru:
   optimizer: ['adam']
   factor: [0.2, 0.4]
   patience: [40,50]
-  dropout: [0.2]
+  dropout: [0.2,0.3]
 
 bigru_cnn_bigru:
   hidden_size: [50, 100]

@@ -21,6 +21,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+import shap
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -29,11 +30,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, TensorDataset
 
 from models import custom_models as mod, mix_augmentation_refined as aug
-from models.tuning import HyperparametersTuner
-from utils.argument_parser import argument_parser
-from utils.cache_loss_accuracy import CacheLossAccuracy
 from utils.input_data import get_datasets
-from utils.save_result import save_accuracy
 
 
 def prepare_multi_step_data(x, y, look_back, n_steps):
@@ -64,7 +61,7 @@ class Trainer:
 
         self.model = self.initialize_model()
         self.optimizer, self.scheduler = self.setup_optimizer_and_scheduler()
-        self.nb_epochs = int(np.ceil(args.iterations * (args.batch_size / self.x_train.shape[0])))
+        self.nb_epochs = int(np.ceil(args.iterations * (args.batch_size / self.x_train.shape[0]))) // 100
 
         self.criterion = nn.MSELoss()
         self.train_loader = DataLoader(TensorDataset(self.x_train, self.y_train), batch_size=args.batch_size,
@@ -72,17 +69,17 @@ class Trainer:
         self.test_loader = DataLoader(TensorDataset(self.x_test, self.y_test), batch_size=args.batch_size,
                                       shuffle=False)
 
-        self.model_prefix = f"{args.dataset}_{self.augmentation_tags}"
+        self.model_prefix = f"{self.augmentation_tags}"
         self.log_dir = os.path.join(args.log_dir, str(self.device), str(args.model), str(args.dataset),
-                                    str(args.augmentation_ratio))
+                                    f"ratio{args.augmentation_ratio}", f"back{self.look_back}_step{self.n_steps}")
         self.weight_dir = os.path.join(args.weight_dir, str(self.device), str(args.model), str(args.dataset),
-                                       str(args.augmentation_ratio))
+                                       f"ratio{args.augmentation_ratio}", f"back{self.look_back}_step{self.n_steps}")
         self.output_dir = os.path.join(args.output_dir, str(self.device), str(args.model), str(args.dataset),
-                                       str(args.augmentation_ratio))
+                                       f"ratio{args.augmentation_ratio}", f"back{self.look_back}_step{self.n_steps}")
 
         self.best_params_dir = os.path.join(args.output_dir, str(self.device), str(args.model), str(args.dataset),
-                                            str(args.augmentation_ratio))
-        self.best_params_file_name = f"{self.model_prefix}_back{self.look_back}_step{self.n_steps}"
+                                            f"ratio{args.augmentation_ratio}", f"back{self.look_back}_step{self.n_steps}")
+        self.best_params_file_name = f"{self.model_prefix}_params"
 
         os.makedirs(self.weight_dir, exist_ok=True)
         os.makedirs(self.log_dir, exist_ok=True)
@@ -338,6 +335,12 @@ class Trainer:
         }
 
     def plot_validation_predictions(self, num_samples=100):
+        """
+        Plots the true vs. predicted values for a subset of the test set and saves the plot.
+
+        Parameters:
+        - num_samples (int): Number of samples to plot from the end of the test set.
+        """
         self.model.eval()
         true_labels = []
         predicted_labels = []
@@ -349,11 +352,152 @@ class Trainer:
                 true_labels.extend(labels.cpu().numpy().flatten())
                 predicted_labels.extend(outputs.cpu().numpy().flatten())
 
+        # Ensure the "predictions" directory exists
+        predictions_dir = os.path.join(self.output_dir, "predictions")
+        os.makedirs(predictions_dir, exist_ok=True)
+
+        # Plot the true vs. predicted values
         plt.figure(figsize=(14, 8))
         plt.plot(true_labels[-num_samples:], color="blue", label="True Labels", linewidth=1)
         plt.plot(predicted_labels[-num_samples:], color="red", label="Predicted Labels", linestyle="--", linewidth=1)
-        plt.xlabel("Sample Index")
+        plt.xlabel("Energy Consumption (KVH)")
         plt.ylabel("Predicted Value")
         plt.title(f"True vs Predicted Values for a Subset of Test Set (Last {num_samples} Samples)")
         plt.legend()
-        plt.show()
+
+        # Save the plot
+        plt.savefig(os.path.join(predictions_dir, f"{self.model_prefix}_pred.png"))
+        plt.close()  # Free memory
+
+    def plot_realtime_predictions(self, num_samples=100, n_steps=5):
+        """
+        Plots the true vs. predicted values for a subset of the test set and future predictions, then saves the plot.
+
+        Parameters:
+        - num_samples (int): Number of samples to plot from the end of the test set.
+        - n_steps (int): Number of future steps to forecast.
+        """
+        self.model.eval()
+        true_labels = []
+        predicted_labels = []
+
+        # Collect true and predicted labels for historical validation period
+        with torch.no_grad():
+            for data, labels in self.test_loader:
+                data, labels = data.to(self.device), labels.to(self.device)
+                outputs = self.model(data)
+                true_labels.extend(labels.cpu().numpy().flatten())
+                predicted_labels.extend(outputs.cpu().numpy().flatten())
+
+        # Historical period: Select the last num_samples for plotting
+        historical_true = true_labels[-num_samples:]
+        historical_pred = predicted_labels[-num_samples:]
+
+        # Prepare for future predictions
+        last_known_input = torch.tensor(historical_pred[-self.look_back:]).to(self.device).unsqueeze(0).unsqueeze(-1)
+        future_predictions = []
+
+        # Rolling forecast for n_steps
+        with torch.no_grad():
+            for _ in range(n_steps):
+                # Ensure `last_known_input` is in the correct shape
+                if last_known_input.dim() == 2:
+                    last_known_input = last_known_input.unsqueeze(0).unsqueeze(-1)  # Reshape for model if needed
+
+                output = self.model(last_known_input)
+                prediction = output.cpu().item()
+                future_predictions.append(prediction)
+
+                # Update rolling input for the next prediction
+                last_known_input = torch.cat([last_known_input[:, 1:], output.unsqueeze(-1)], dim=1)
+
+        # Ensure the "predictions" directory exists
+        predictions_dir = os.path.join(self.output_dir, "predictions")
+        os.makedirs(predictions_dir, exist_ok=True)
+
+        # Plot historical and future predictions
+        plt.figure(figsize=(14, 8))
+
+        # Historical Data
+        plt.plot(historical_true, color="blue", label="True Labels (Historical)", linewidth=1)
+        plt.plot(historical_pred, color="red", label="Predicted Labels (Historical)", linestyle="--", linewidth=1)
+
+        # Future Predictions
+        future_indices = range(len(historical_true), len(historical_true) + n_steps)
+        plt.plot(future_indices, future_predictions, color="green", label=f"Forecast (Next {n_steps} Steps)",
+                 linestyle="--", marker='o')
+
+        # Plot Labels and Title
+        plt.xlabel("Days")
+        plt.ylabel("Value")
+        plt.title(f"True vs Predicted Values with Future Forecast (Last {num_samples} Days and Next {n_steps} Steps)")
+        plt.legend()
+
+        # Save the figure
+        plt.savefig(os.path.join(predictions_dir, f"{self.model_prefix}_realtime_pred.png"))
+        plt.close()  # Free memory
+
+    def interpret_predictions(self, samples=10, method="shap"):
+        """
+        Generates SHAP or LIME explanations for the model's predictions on test data and saves the plot.
+
+        Parameters:
+        - samples (int): Number of test samples to explain.
+        - method (str): Either "shap" or "lime" to specify the interpretation method.
+        """
+        self.model.eval()  # Ensure model is in evaluation mode
+
+        # Select a subset of test data for interpretation
+        test_data = next(iter(self.test_loader))
+        data_samples = test_data[0][:samples].to(self.device)  # Shape: (samples, look_back, features)
+
+        # Define a wrapper function to reshape SHAP inputs to match model's expected input shape
+        def model_predict_wrapper(x):
+            x_tensor = torch.tensor(x, dtype=torch.float32).view(-1, *data_samples.shape[1:]).to(self.device)
+            with torch.no_grad():
+                return self.model(x_tensor).cpu().numpy()
+
+        # Set up file path for saving explanation plots
+        explanation_dir = os.path.join(self.output_dir, self.model_prefix)
+        os.makedirs(explanation_dir, exist_ok=True)  # Ensure the directory exists
+
+        plot_file_path_base = os.path.join(explanation_dir, "explanation_")
+
+        if method == "shap":
+            # SHAP Kernel Explainer for model-agnostic interpretation
+            explainer = shap.KernelExplainer(model_predict_wrapper, data_samples.cpu().numpy().reshape(samples, -1))
+            shap_values = explainer.shap_values(data_samples.cpu().numpy().reshape(samples, -1))
+
+            # If shap_values has an extra dimension (e.g., for multi-output), select the first output
+            if isinstance(shap_values, list):  # shap_values might be a list if there are multiple outputs
+                shap_values = shap_values[0]  # Use only the first output for visualization
+
+            # Ensure the shapes align for the summary plot
+            data_matrix = data_samples.cpu().numpy().reshape(samples, -1)
+
+            # Create and save the refined SHAP bar plot
+            shap.summary_plot(shap_values, data_matrix, plot_type="bar", show=False)
+
+            # Save the improved bar plot
+            plt.savefig(plot_file_path_base + "shap_global_feature_importance.png")
+            plt.close()  # Close the plot to free memory
+
+        elif method == "lime":
+            from lime import lime_tabular
+
+            # LIME explainer for tabular data
+            explainer = lime_tabular.LimeTabularExplainer(
+                data_samples.cpu().numpy().reshape(samples, -1),  # Flatten for LIME compatibility
+                mode="regression"
+            )
+
+            # Generate LIME explanations for each sample and save as PNG
+            for i in range(min(5, samples)):  # Limit to a few samples for simplicity
+                explanation = explainer.explain_instance(
+                    data_samples[i].cpu().numpy().flatten(), model_predict_wrapper
+                )
+                fig = explanation.as_pyplot_figure()  # Convert LIME explanation to matplotlib figure
+                fig.savefig(plot_file_path_base + f"lime_sample_{i}.png")  # Save as PNG
+                plt.close(fig)  # Close the figure to free memory
+        else:
+            raise ValueError("Unsupported interpretation method. Choose 'shap' or 'lime'.")
