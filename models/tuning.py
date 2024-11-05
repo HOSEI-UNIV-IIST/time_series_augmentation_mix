@@ -54,94 +54,93 @@ class HyperparametersTuner:
         """
         Objective function for Optuna hyperparameter tuning. Minimizes a composite score based on validation loss
         and accuracy.
-
-        Parameters:
-        - trial (optuna.Trial): An Optuna trial to suggest hyperparameters.
-
-        Returns:
-        - float: Composite score based on validation loss and accuracy.
         """
         # Sample hyperparameters based on the model type
         params = self.sample_hyperparameters(trial)
 
-        # Initialize model and optimizer with suggested parameters
-        model_name = self.trainer.args.model
-        if model_name in ["cnn"]:
-            self.trainer.model = self.trainer.initialize_model(
-                num_filters=params['num_filters'],
-                kernel_size=params['kernel_size'],
-                pool_size=params['pool_size'],
-                dropout=params['dropout']
+        try:
+            # Initialize model and optimizer with suggested parameters
+            model_name = self.trainer.args.model
+            if model_name in ["cnn"]:
+                self.trainer.model = self.trainer.initialize_model(
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    dropout=params['dropout']
+                )
+            elif model_name in ["lstm", "gru"]:
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    n_layers=params['n_layers'],
+                    dropout=params['dropout']
+                )
+            else:  # Hybrid CNN-RNN models
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    n_layers=params['n_layers'],
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    dropout=params['dropout']
+                )
+
+            self.trainer.optimizer, self.trainer.scheduler = self.trainer.setup_optimizer_and_scheduler(
+                learning_rate=params['learning_rate'],
+                optimizer_type=params['optimizer'],
+                factor=params['factor'],
+                patience=params['patience']
             )
-        elif model_name in ["lstm", "gru"]:
-            self.trainer.model = self.trainer.initialize_model(
-                hidden_size=params['hidden_size'],
-                n_layers=params['n_layers'],
-                dropout=params['dropout']
-            )
-        else:  # Hybrid CNN-RNN models
-            self.trainer.model = self.trainer.initialize_model(
-                hidden_size=params['hidden_size'],
-                n_layers=params['n_layers'],
-                num_filters=params['num_filters'],
-                kernel_size=params['kernel_size'],
-                pool_size=params['pool_size'],
-                dropout=params['dropout']
-            )
 
-        self.trainer.optimizer, self.trainer.scheduler = self.trainer.setup_optimizer_and_scheduler(
-            learning_rate=params['learning_rate'],
-            optimizer_type=params['optimizer'],
-            factor=params['factor'],
-            patience=params['patience']
-        )
+            # Track time and memory usage during tuning
+            tracemalloc.start()
+            start_time = time.time()
 
-        # Track time and memory usage during tuning
-        tracemalloc.start()
-        start_time = time.time()
+            # Use existing train_and_validate with early stopping
+            nb_epochs = self.trainer.nb_epochs
+            val_losses, val_accuracies = self.trainer.train_and_validate(nb_epochs=nb_epochs)
 
-        # Use existing train_and_validate with early stopping
-        nb_epochs = self.trainer.nb_epochs
-        val_losses, val_accuracies = self.trainer.train_and_validate(nb_epochs=nb_epochs)
+            # Measure elapsed time and memory
+            duration_seconds = time.time() - start_time
+            current, peak = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
 
-        # Measure elapsed time and memory
-        duration_seconds = time.time() - start_time
-        current, peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
+            # Convert duration to hours:minutes:seconds format and memory to MB
+            duration_hms = time.strftime('%H:%M:%S', time.gmtime(duration_seconds))
+            memory_mb = peak / (1024 * 1024)  # Convert bytes to MB
 
-        # Convert duration to hours:minutes:seconds format and memory to MB
-        duration_hms = time.strftime('%H:%M:%S', time.gmtime(duration_seconds))
-        memory_mb = peak / (1024 * 1024)  # Convert bytes to MB
+            # Update params with additional information
+            params.update({
+                'duration': duration_hms,
+                'memory_used_mb': round(memory_mb, 2),
+                'epochs_run': len(val_losses)
+            })
 
-        # Update params with additional information
-        params.update({
-            'duration': duration_hms,
-            'memory_used_mb': round(memory_mb, 2),
-            'epochs_run': len(val_losses)
-        })
+            # Calculate composite score for Optuna, using a weighted formula:
+            # score = loss_weight * val_loss - accuracy_weight * val_accuracy
+            final_val_loss = val_losses[-1]
+            final_val_accuracy = val_accuracies[-1]
+            combined_score = self.loss_weight * final_val_loss - self.accuracy_weight * final_val_accuracy
 
-        # Calculate composite score for Optuna, using a weighted formula:
-        # score = loss_weight * val_loss - accuracy_weight * val_accuracy
-        final_val_loss = val_losses[-1]
-        final_val_accuracy = val_accuracies[-1]
-        combined_score = self.loss_weight * final_val_loss - self.accuracy_weight * final_val_accuracy
+            # Save additional metrics for analysis
+            trial.set_user_attr("final_val_loss", final_val_loss)
+            trial.set_user_attr("final_val_accuracy", final_val_accuracy)
+            trial.set_user_attr("duration_hms", duration_hms)
+            trial.set_user_attr("memory_used_mb", round(memory_mb, 2))
+            trial.set_user_attr("epochs_run", len(val_losses))
 
-        # Save additional metrics for analysis
-        trial.set_user_attr("final_val_loss", final_val_loss)
-        trial.set_user_attr("final_val_accuracy", final_val_accuracy)
-        trial.set_user_attr("duration_hms", duration_hms)
-        trial.set_user_attr("memory_used_mb", round(memory_mb, 2))
-        trial.set_user_attr("epochs_run", len(val_losses))
+            # Logging progress
+            print(f"Trial {trial.number}: Loss = {final_val_loss}, Accuracy = {final_val_accuracy}, "
+                  f"Combined Score = {combined_score}, Duration = {duration_hms}, Memory = {memory_mb:.2f} MB")
 
-        # Logging progress
-        print(f"Trial {trial.number}: Loss = {final_val_loss}, Accuracy = {final_val_accuracy}, "
-              f"Combined Score = {combined_score}, Duration = {duration_hms}, Memory = {memory_mb:.2f} MB")
+            # Store params in trial for Optuna's record-keeping
+            trial.set_user_attr("params", params)
 
-        # Store params in trial for Optuna's record-keeping
-        trial.set_user_attr("params", params)
+            # Return combined score for Optuna to minimize
+            return combined_score
 
-        # Return combined score for Optuna to minimize
-        return combined_score
+        except Exception as e:
+            print(f"Trial {trial.number} failed with exception: {e}")
+            raise optuna.TrialPruned()  # Prune the trial and continue to the next
 
     def sample_hyperparameters(self, trial):
         """Sample model-specific hyperparameters for optimization using configuration file values."""

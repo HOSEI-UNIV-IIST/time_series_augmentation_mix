@@ -331,16 +331,13 @@ class FlexibleCNN_Attention_BiGRU(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
+                nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
 
-            # Only apply MaxPool1d if it won't reduce the output size to zero
-            if output_dim > effective_pool_size:
-                layers.append(nn.MaxPool1d(effective_pool_size))
-                output_dim = (output_dim + 1) // effective_pool_size
-
             in_channels = num_filters
             num_filters *= 2
+            output_dim = (output_dim + 1) // effective_pool_size
 
         return nn.Sequential(*layers)
 
@@ -386,7 +383,7 @@ class FlexibleCNN_Attention_BiLSTM(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters
