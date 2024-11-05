@@ -14,13 +14,21 @@ Lab: Prof YU Keping's Lab
 
 import argparse
 
+
 def argument_parser():
     global args
     parser = argparse.ArgumentParser(description='Runs augmentation model.')
     # General settings
     parser.add_argument('--gpus', type=int, default=1, help="Number of GPUs to use")
     parser.add_argument('--dataset', type=str, default='CBF', help='Name of dataset to test (required, ex: unipen1a)')
-    parser.add_argument('--model', type=str, default="lstm1", help="Set model name")
+    parser.add_argument('--model', type=str, default="gru",
+                        choices=[
+                            "cnn", "lstm", "gru", "cnn_lstm", "cnn_gru",
+                            "bigru_cnn_bigru", "bilstm_cnn_bilstm",
+                            "cnn_attention_bigru", "cnn_attention_bilstm",
+                        ],
+                        help="Set model name")
+    parser.add_argument('--tune', default=False, action="store_true", help="Hyperparameters Tuner?")
     parser.add_argument('--train', default=True, action="store_true", help="Train?")
     parser.add_argument('--save', default=True, action="store_true", help="Save to disk?")
     parser.add_argument('--extension', type=str, default='txt', help="Dataset file extension")
@@ -89,7 +97,8 @@ def argument_parser():
     parser.add_argument('--weight_dir', type=str, default="weights", help="Weight path")
     parser.add_argument('--log_dir', type=str, default="logs", help="Log path")
     parser.add_argument('--output_dir', type=str, default="output", help="Output path")
-    parser.add_argument('--normalize_input', default=True, action="store_true", help="Normalize between [-1,1] or [0,1]")
+    parser.add_argument('--normalize_input', default=True, action="store_true",
+                        help="Normalize between [-1,1] or [0,1]")
     parser.add_argument('--normalize_input_positive', default=True, action="store_true", help="Normalize between [0,1]")
     parser.add_argument('--delimiter', type=str, default=" ", help="Delimiter")
     # Network settings
@@ -97,7 +106,7 @@ def argument_parser():
     parser.add_argument('--lr', type=float, default=1e-3, help="Learning Rate")
     parser.add_argument('--validation_split', type=int, default=0, help="Size of validation set")
     parser.add_argument('--iterations', type=int, default=10000, help="Number of iterations")
-    parser.add_argument('--batch_size', type=int, default=256, help="Batch size")
+    parser.add_argument('--batch_size', type=int, default=64, help="Batch size")
     parser.add_argument('--verbose', type=int, default=2, help="Verbose")
     args = parser.parse_args()
     return args
