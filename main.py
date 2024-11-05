@@ -25,8 +25,8 @@ from utils.save_result import save_accuracy
 
 if __name__ == '__main__':
     args = argument_parser()
-    look_back = 7
-    n_steps = 3
+    look_back = 3
+    n_steps = 1
     trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
 
     tuner = HyperparametersTuner(trainer, accuracy_weight=0.5, loss_weight=0.5,
@@ -82,5 +82,6 @@ if __name__ == '__main__':
     # SHAPE OR LIME for  INTERPRETATION
     if args.interpret:
         print("Interpreting predictions with SHAP or LIME...")
-        trainer.interpret_predictions(samples=10, method=args.interpret_method)
+        trainer.interpret_predictions_bar(samples=10, method=args.interpret_method)
+        trainer.interpret_predictions_line(samples=50, method=args.interpret_method)
 

@@ -25,6 +25,7 @@ import shap
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from lime import lime_tabular
 from sklearn.metrics import r2_score
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, TensorDataset
@@ -61,7 +62,7 @@ class Trainer:
 
         self.model = self.initialize_model()
         self.optimizer, self.scheduler = self.setup_optimizer_and_scheduler()
-        self.nb_epochs = int(np.ceil(args.iterations * (args.batch_size / self.x_train.shape[0]))) // 100
+        self.nb_epochs = int(np.ceil(args.iterations * (args.batch_size / self.x_train.shape[0])))
 
         self.criterion = nn.MSELoss()
         self.train_loader = DataLoader(TensorDataset(self.x_train, self.y_train), batch_size=args.batch_size,
@@ -78,7 +79,8 @@ class Trainer:
                                        f"ratio{args.augmentation_ratio}", f"back{self.look_back}_step{self.n_steps}")
 
         self.best_params_dir = os.path.join(args.output_dir, str(self.device), str(args.model), str(args.dataset),
-                                            f"ratio{args.augmentation_ratio}", f"back{self.look_back}_step{self.n_steps}")
+                                            f"ratio{args.augmentation_ratio}",
+                                            f"back{self.look_back}_step{self.n_steps}")
         self.best_params_file_name = f"{self.model_prefix}_params"
 
         os.makedirs(self.weight_dir, exist_ok=True)
@@ -124,7 +126,8 @@ class Trainer:
 
     def initialize_model(self, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2, dropout=0.2):
         model = mod.get_model(self.args.model, self.input_shape, n_steps=self.n_steps, hidden_size=hidden_size,
-                              n_layers=n_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=2, dropout=0.2).to(self.device)
+                              n_layers=n_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=2,
+                              dropout=0.2).to(self.device)
         return self.wrap_model_with_dataparallel(model)
 
     def wrap_model_with_dataparallel(self, model):
@@ -437,7 +440,7 @@ class Trainer:
         plt.savefig(os.path.join(predictions_dir, f"{self.model_prefix}_realtime_pred.png"))
         plt.close()  # Free memory
 
-    def interpret_predictions(self, samples=10, method="shap"):
+    def interpret_predictions_bar(self, samples=10, method="shap"):
         """
         Generates SHAP or LIME explanations for the model's predictions on test data and saves the plot.
 
@@ -458,10 +461,10 @@ class Trainer:
                 return self.model(x_tensor).cpu().numpy()
 
         # Set up file path for saving explanation plots
-        explanation_dir = os.path.join(self.output_dir, self.model_prefix)
+        explanation_dir = os.path.join(self.output_dir, "explanation")
         os.makedirs(explanation_dir, exist_ok=True)  # Ensure the directory exists
 
-        plot_file_path_base = os.path.join(explanation_dir, "explanation_")
+        plot_file_path_base = os.path.join(explanation_dir, f"{self.model_prefix}_")
 
         if method == "shap":
             # SHAP Kernel Explainer for model-agnostic interpretation
@@ -497,7 +500,71 @@ class Trainer:
                     data_samples[i].cpu().numpy().flatten(), model_predict_wrapper
                 )
                 fig = explanation.as_pyplot_figure()  # Convert LIME explanation to matplotlib figure
-                fig.savefig(plot_file_path_base + f"lime_sample_{i}.png")  # Save as PNG
+                fig.savefig(plot_file_path_base + f"lime_feature_importance_{i}_bar.png")  # Save as PNG
                 plt.close(fig)  # Close the figure to free memory
+        else:
+            raise ValueError("Unsupported interpretation method. Choose 'shap' or 'lime'.")
+
+    def interpret_predictions_line(self, samples=10, method="shap"):
+        """
+        Generates SHAP or LIME explanations for the model's predictions on test data and saves the plot.
+
+        Parameters:
+        - samples (int): Number of test samples to explain.
+        - method (str): Either "shap" or "lime" to specify the interpretation method.
+        """
+        self.model.eval()
+        test_data = next(iter(self.test_loader))
+        data_samples = test_data[0][:samples].to(self.device)  # Limit to the actual number of available samples
+
+        def model_predict_wrapper(x):
+            x_tensor = torch.tensor(x, dtype=torch.float32).view(-1, *data_samples.shape[1:]).to(self.device)
+            with torch.no_grad():
+                return self.model(x_tensor).cpu().numpy()
+
+        explanation_dir = os.path.join(self.output_dir, "explanation")
+        os.makedirs(explanation_dir, exist_ok=True)
+        plot_file_path_base = os.path.join(explanation_dir, f"{self.model_prefix}_")
+
+        if method == "shap":
+            explainer = shap.KernelExplainer(model_predict_wrapper, data_samples.cpu().numpy().reshape(samples, -1))
+            shap_values = explainer.shap_values(data_samples.cpu().numpy().reshape(samples, -1))
+            shap_values = shap_values[0] if isinstance(shap_values, list) else shap_values
+
+            data_matrix = data_samples.cpu().numpy().reshape(samples, -1)
+            shap.summary_plot(shap_values, data_matrix, plot_type="bar", show=False)
+            plt.savefig(plot_file_path_base + "shap_global_feature_importance.png")
+            plt.close()
+
+        elif method == "lime":
+            # Ensure data_samples is reshaped properly for LimeTabularExplainer
+            data_samples_reshaped = data_samples.cpu().numpy().reshape(samples, -1)
+
+            explainer = lime_tabular.LimeTabularExplainer(data_samples_reshaped, mode="regression")
+
+            feature_importance_over_time = []
+            for i in range(min(samples, data_samples_reshaped.shape[0])):  # Ensure samples don't exceed available data
+                explanation = explainer.explain_instance(
+                    data_samples_reshaped[i], model_predict_wrapper
+                )
+                local_feature_importance = np.array([weight for _, weight in explanation.as_list()])
+                feature_importance_over_time.append(local_feature_importance)
+
+            feature_importance_over_time = np.array(feature_importance_over_time).T
+
+            plt.figure(figsize=(12, 8))
+            for j in range(feature_importance_over_time.shape[0]):
+                plt.plot(range(feature_importance_over_time.shape[1]), feature_importance_over_time[j],
+                         label=f"Feature {j + 1}")
+
+            plt.xlabel("Sample Index")
+            plt.ylabel("Feature Importance")
+            plt.title("LIME Feature Importance Over Time")
+            plt.legend(loc="upper right")
+            plt.grid(True)
+            plt.tight_layout()
+            plt.savefig(plot_file_path_base + "lime_feature_importance_over_time.png")
+            plt.close()
+
         else:
             raise ValueError("Unsupported interpretation method. Choose 'shap' or 'lime'.")
