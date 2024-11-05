@@ -25,8 +25,8 @@ from utils.save_result import save_accuracy
 
 if __name__ == '__main__':
     args = argument_parser()
-    look_back = 3
-    n_steps = 1
+    look_back = 7
+    n_steps = 2
     trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
 
     tuner = HyperparametersTuner(trainer, accuracy_weight=0.5, loss_weight=0.5,

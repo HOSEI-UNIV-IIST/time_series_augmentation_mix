@@ -96,13 +96,17 @@ class Trainer:
             writer.writerow(["Epoch", "Phase", "Loss", "Accuracy", "MAE", "MSE", "RMSE", "MAPE"])  # Header
 
     def load_and_prepare_data(self):
-        x_train_, y_train_, x_test_, y_test_ = get_datasets(self.args)
+        # Load dataset and check for augmentation
+        x_train_, y_train_, x_test_, y_test_, is_augmented, augmentation_method = get_datasets(self.args)
 
-        if self.args.original:
-            augmentation_tags = '_original'
-            duration = 0
+        # Skip augmentation if dataset is already augmented
+        if is_augmented:
+            print("Dataset is already augmented; skipping augmentation.")
+            augmentation_tags = augmentation_method or "_original"
+            duration = 0  # No augmentation, so no duration time
         else:
-            print(f"Augmentation method: {self.args.augmentation_method}")
+            # Apply augmentation if required
+            print(f"Applying augmentation method: {self.args.augmentation_method}")
             started_at = time.time() * 1000
             x_train, y_train, augmentation_tags = aug.run_augmentation_refined(x_train_, y_train_, self.args)
             ended_at = time.time() * 1000
@@ -111,16 +115,23 @@ class Trainer:
             print(
                 f"x_train shape after augmentation: {x_train.shape}, y_train shape after augmentation: {y_train.shape}")
 
+            # Save the augmented dataset with the appropriate descriptor and ratio
+            augmentation_file_path = os.path.join(
+                self.args.data_dir, self.args.dataset,
+                f"{self.args.dataset}_TRAIN_{self.args.augmentation_method}.csv"
+            )
+            np.savetxt(augmentation_file_path, np.c_[x_train, y_train], delimiter=";")
+            print(f"Augmented dataset saved at {augmentation_file_path}")
+
+        # Prepare data for multi-step forecasting
         x_train, y_train = prepare_multi_step_data(x_train_, y_train_, self.look_back, self.n_steps)
         x_test, y_test = prepare_multi_step_data(x_test_, y_test_, self.look_back, self.n_steps)
 
+        # Convert to PyTorch tensors
         x_train = torch.tensor(x_train, dtype=torch.float32)
         x_test = torch.tensor(x_test, dtype=torch.float32)
         y_train = torch.tensor(y_train, dtype=torch.float32)
         y_test = torch.tensor(y_test, dtype=torch.float32)
-
-        print(f"x_train shape after preparation: {x_train.shape}")
-        print(f"y_train shape after preparation: {y_train.shape}")
 
         return x_train, y_train, x_test, y_test, augmentation_tags, duration
 
