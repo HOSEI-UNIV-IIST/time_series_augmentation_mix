@@ -1,0 +1,41 @@
+# config/run_params.yaml
+
+# Specify device: "cpu" or "gpu" for CUDA devices
+device: "gpu"
+
+# General settings
+general:
+  gpus: 1  # Number of GPUs to use if device is "gpu"; ignored if device is "cpu"
+  model: "fcn"
+  optimizer: "adam"
+  interpret_method: "lime"
+  normalization: true
+  train: true
+  tune: true
+  save: true
+
+# Datasets to process
+datasets:
+  - ELECTRICITY_GLOBAL_REACTIVE_POWER
+  - GAS_PANTHER_EDUCATION_MOHAMMAD
+  - ELECTRICITY_MOUSE_HEALTH_ESTELA
+  - HOTWATER_FOX_LODGING_ALANA
+  - SOLAR_BOBCAT_EDUCATION_ALISSA
+  - SOLAR_BOBCAT_EDUCATION_COLEMAN
+  - WATER_PANTHER_LODGING_CORA
+  - ELECTRICITY_MOUSE_SCIENCE_MICHEAL
+  - HOTWATER_ROBIN_EDUCATION_MARGARITO
+  - WATER_WOLF_EDUCATION_URSULA
+  - ELECTRICITY_GLOBAL_REACTIVE_POWER
+  - GAS_PANTHER_LODGING_DEAN
+
+# Augmentation techniques to apply
+augmentation_methods:
+  - sequential_combined4
+  - sequential_combined5
+  - sequential_combined7
+  - sequential_combined12
+  - parallel_combined3
+  - parallel_combined4
+  - parallel_combined10
+  - parallel_combined12
