@@ -32,13 +32,14 @@ def load_data_from_file(data_file, label_file=None, is_augmented=False):
     """
     if label_file:
         # Load data and labels from separate files, assuming they have no headers
-        data = pd.read_csv(data_file, sep=";").values
-        labels = pd.read_csv(label_file, sep=";").values
+        data = pd.read_csv(data_file, sep=",").values
+        labels = pd.read_csv(label_file, sep=",").values
         if labels.ndim > 1:
             labels = labels[:, 0]  # Use only the first column if labels has multiple columns
     else:
         # Load data and labels from a single file, assuming no headers
-        raw_data = pd.read_csv(data_file, sep=";").values
+        raw_data = pd.read_csv(data_file)
+        raw_data = raw_data.values
         if is_augmented:
             labels = raw_data[:, -1]  # Labels are in the last column for augmented data
             data = raw_data[:, :-1]   # Features are all columns except the last
@@ -93,8 +94,8 @@ def get_datasets(args):
     Main function to get train and test datasets, optionally checking for augmented versions and normalizing as needed.
     """
     # Determine file paths
-    train_data_file = os.path.join(args.data_dir, args.dataset, f"{args.dataset}_TRAIN.csv")
-    test_data_file = os.path.join(args.data_dir, args.dataset, f"{args.dataset}_TEST.csv")
+    train_data_file = os.path.join(args.data_dir, args.dataset, f"{args.dataset}_TRAIN.CSV")
+    test_data_file = os.path.join(args.data_dir, args.dataset, f"{args.dataset}_TEST.CSV")
 
     # Check for augmented train data file if requested
     is_train_augmented = False
