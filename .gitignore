@@ -1,13 +1,14 @@
-.idea
-/weights/
-/output/
-/logs/
-/visual/data
-/visual/plots
+# Ignore specific directories
+.idea/
+weights/
+output/
+logs/
+visual/data/
+visual/plots/
 
 # Ignore everything in the data directory
 data/*
-# Un-ignore the "meters/final" directory
+
+# Allow everything in "data/meters/final/"
 !data/meters/final/
-# Allow all files in "data/meters/final"
 !data/meters/final/*
