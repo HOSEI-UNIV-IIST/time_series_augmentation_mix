@@ -1,0 +1,7 @@
+.idea
+/weights/
+/output/
+/logs/
+/visual/data
+/visual/plots
+/data/
