@@ -47,8 +47,9 @@ import torch
 import torch.nn as nn
 
 
-def get_model(model_name, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3,
-              pool_size=2, dropout=0.3):
+def get_model(model_name, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, am_layers=1, gru_layers=1,
+              lstm_layers=1, bigru_layers=1, bilstm_layers=1, bigru1_layers=1, bigru2_layers=1, bilstm1_layers=1,
+              bilstm2_layers=1, num_filters=64, kernel_size=3, pool_size=2, dropout=0.3):
     """Retrieves the specified model by name with the provided hyperparameters."""
     models = {
         "lstm": FlexibleLSTM,
@@ -62,30 +63,74 @@ def get_model(model_name, input_shape, n_steps=10, hidden_size=100, n_layers=1, 
         "cnn_attention_bilstm": FlexibleCNN_Attention_BiLSTM
     }
 
-    cnn_only_models = ["cnn"]
-    rnn_only_models = ["lstm", "gru"]
-    cnn_rnn_hybrid_models = [
-        "cnn_lstm", "cnn_gru", "bigru_cnn_bigru", "bilstm_cnn_bilstm",
-        "cnn_attention_bigru", "cnn_attention_bilstm"
-    ]
+    # CNN-only models
+    if model_name == "cnn":
+        return models[model_name](
+            input_shape, n_steps=n_steps, num_filters=num_filters, kernel_size=kernel_size,
+            cnn_layers=cnn_layers, pool_size=pool_size, dropout=dropout
+        )
 
-    if model_name in cnn_only_models:
-        return models[model_name](input_shape, n_steps=n_steps, num_filters=num_filters, kernel_size=kernel_size,
-                                  n_layers=n_layers, pool_size=pool_size, dropout=dropout)
-    elif model_name in rnn_only_models:
-        return models[model_name](input_shape, n_steps=n_steps, hidden_size=hidden_size, n_layers=n_layers,
-                                  dropout=dropout)
-    elif model_name in cnn_rnn_hybrid_models:
-        return models[model_name](input_shape, n_steps=n_steps, hidden_size=hidden_size, n_layers=n_layers,
-                                  num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size,
-                                  dropout=dropout)
+    # RNN-only models (LSTM, GRU)
+    elif model_name == "lstm":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, lstm_layers=lstm_layers, dropout=dropout
+        )
+    elif model_name == "gru":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, gru_layers=gru_layers, dropout=dropout
+        )
+
+    # CNN-RNN hybrid models
+    elif model_name == "cnn_lstm":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, cnn_layers=cnn_layers, lstm_layers=lstm_layers,
+            num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size, dropout=dropout
+        )
+    elif model_name == "cnn_gru":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, cnn_layers=cnn_layers, gru_layers=gru_layers,
+            num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size, dropout=dropout
+        )
+
+    # Bi-directional GRU-CNN-GRU model
+    elif model_name == "bigru_cnn_bigru":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, cnn_layers=cnn_layers,
+            bigru1_layers=bigru1_layers, bigru2_layers=bigru2_layers,
+            num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size, dropout=dropout
+        )
+
+    # Bi-directional LSTM-CNN-LSTM model
+    elif model_name == "bilstm_cnn_bilstm":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, cnn_layers=cnn_layers,
+            bilstm1_layers=bilstm1_layers, bilstm2_layers=bilstm2_layers,
+            num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size, dropout=dropout
+        )
+
+    # CNN-Attention-BiGRU model
+    elif model_name == "cnn_attention_bigru":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, cnn_layers=cnn_layers, am_layers=am_layers,
+            bigru_layers=bigru_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size,
+            dropout=dropout
+        )
+
+    # CNN-Attention-BiLSTM model
+    elif model_name == "cnn_attention_bilstm":
+        return models[model_name](
+            input_shape, n_steps=n_steps, hidden_size=hidden_size, cnn_layers=cnn_layers, am_layers=am_layers,
+            bilstm_layers=bilstm_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size,
+            dropout=dropout
+        )
+
     raise ValueError(f"Model {model_name} not found")
 
 
 class FlexibleCNN(nn.Module):
     """Simple CNN with BatchNorm, ReLU, MaxPooling, and Dropout."""
 
-    def __init__(self, input_shape, n_steps=10, num_filters=64, kernel_size=3, n_layers=2, pool_size=2, dropout=0.3):
+    def __init__(self, input_shape, n_steps=10, num_filters=64, kernel_size=3, cnn_layers=2, pool_size=2, dropout=0.3):
         super().__init__()
         self.input_shape = input_shape  # Store input shape for use in helper functions
         self.num_features = input_shape[1]
@@ -93,7 +138,7 @@ class FlexibleCNN(nn.Module):
         in_channels = self.num_features
         output_dim = self.input_shape[0]  # look_back dimension
 
-        for _ in range(n_layers):
+        for _ in range(cnn_layers):
             kernel_size = min(kernel_size, output_dim)
             effective_pool_size = min(pool_size, output_dim)
             layers += [
@@ -118,10 +163,10 @@ class FlexibleCNN(nn.Module):
 class FlexibleLSTM(nn.Module):
     """Standard LSTM model with Dropout."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, dropout=0.3):
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, lstm_layers=1, dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.lstm = nn.LSTM(self.input_shape[1], hidden_size, n_layers, batch_first=True, dropout=dropout)
+        self.lstm = nn.LSTM(self.input_shape[1], hidden_size, lstm_layers, batch_first=True, dropout=dropout)
         self.fc = nn.Linear(hidden_size, n_steps)
 
     def forward(self, x):
@@ -132,10 +177,10 @@ class FlexibleLSTM(nn.Module):
 class FlexibleGRU(nn.Module):
     """Standard GRU model with Dropout."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, dropout=0.3):
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, gru_layers=1, dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.gru = nn.GRU(self.input_shape[1], hidden_size, n_layers, batch_first=True, dropout=dropout)
+        self.gru = nn.GRU(self.input_shape[1], hidden_size, gru_layers, batch_first=True, dropout=dropout)
         self.fc = nn.Linear(hidden_size, n_steps)
 
     def forward(self, x):
@@ -146,13 +191,14 @@ class FlexibleGRU(nn.Module):
 class FlexibleCNN_LSTM(nn.Module):
     """CNN followed by LSTM with BatchNorm, ReLU, MaxPooling, and Dropout."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2,
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, lstm_layers=1, num_filters=64,
+                 kernel_size=3, pool_size=2,
                  dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, n_layers, pool_size,
+        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, cnn_layers, pool_size,
                                                  dropout)
-        self.lstm = nn.LSTM(num_filters * (2 ** (n_layers - 1)), hidden_size, n_layers, batch_first=True,
+        self.lstm = nn.LSTM(num_filters * (2 ** (lstm_layers - 1)), hidden_size, lstm_layers, batch_first=True,
                             dropout=dropout)
         self.fc = nn.Linear(hidden_size, n_steps)
 
@@ -185,13 +231,15 @@ class FlexibleCNN_LSTM(nn.Module):
 class FlexibleCNN_GRU(nn.Module):
     """CNN followed by GRU with BatchNorm, ReLU, MaxPooling, and Dropout."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2,
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, gru_layers=1, num_filters=64,
+                 kernel_size=3, pool_size=2,
                  dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, n_layers, pool_size,
+        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, cnn_layers, pool_size,
                                                  dropout)
-        self.gru = nn.GRU(num_filters * (2 ** (n_layers - 1)), hidden_size, n_layers, batch_first=True, dropout=dropout)
+        self.gru = nn.GRU(num_filters * (2 ** (gru_layers - 1)), hidden_size, gru_layers, batch_first=True,
+                          dropout=dropout)
         self.fc = nn.Linear(hidden_size, n_steps)
 
     def _build_cnn_layers(self, in_channels, num_filters, kernel_size, n_layers, pool_size, dropout):
@@ -223,15 +271,16 @@ class FlexibleCNN_GRU(nn.Module):
 class FlexibleBiGRU_CNN_BiGRU(nn.Module):
     """Bidirectional GRU, followed by CNN, and another Bidirectional GRU."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2,
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, bigru1_layers=1, bigru2_layers=1,
+                 num_filters=64, kernel_size=3, pool_size=2,
                  dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.initial_gru = nn.GRU(self.input_shape[1], hidden_size, n_layers, batch_first=True, bidirectional=True,
+        self.initial_gru = nn.GRU(self.input_shape[1], hidden_size, bigru1_layers, batch_first=True, bidirectional=True,
                                   dropout=dropout)
-        self.cnn_layers = self._build_cnn_layers(hidden_size * 2, num_filters, kernel_size, n_layers, pool_size,
+        self.cnn_layers = self._build_cnn_layers(hidden_size * 2, num_filters, kernel_size, cnn_layers, pool_size,
                                                  dropout)
-        self.final_gru = nn.GRU(num_filters * (2 ** (n_layers - 1)), hidden_size, n_layers, batch_first=True,
+        self.final_gru = nn.GRU(num_filters * (2 ** (bigru2_layers - 1)), hidden_size, bigru2_layers, batch_first=True,
                                 bidirectional=True, dropout=dropout)
         self.fc = nn.Linear(hidden_size * 2, n_steps)
 
@@ -265,15 +314,18 @@ class FlexibleBiGRU_CNN_BiGRU(nn.Module):
 class FlexibleBiLSTM_CNN_BiLSTM(nn.Module):
     """Bidirectional LSTM, followed by CNN and another Bidirectional LSTM."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2,
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, bilstm1_layers=1, bilstm2_layers=1,
+                 num_filters=64, kernel_size=3, pool_size=2,
                  dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.initial_lstm = nn.LSTM(self.input_shape[1], hidden_size, n_layers, batch_first=True, bidirectional=True,
+        self.initial_lstm = nn.LSTM(self.input_shape[1], hidden_size, bilstm1_layers, batch_first=True,
+                                    bidirectional=True,
                                     dropout=dropout)
-        self.cnn_layers = self._build_cnn_layers(hidden_size * 2, num_filters, kernel_size, n_layers, pool_size,
+        self.cnn_layers = self._build_cnn_layers(hidden_size * 2, num_filters, kernel_size, cnn_layers, pool_size,
                                                  dropout)
-        self.final_lstm = nn.LSTM(num_filters * (2 ** (n_layers - 1)), hidden_size, n_layers, batch_first=True,
+        self.final_lstm = nn.LSTM(num_filters * (2 ** (bilstm2_layers - 1)), hidden_size, bilstm2_layers,
+                                  batch_first=True,
                                   bidirectional=True, dropout=dropout)
         self.fc = nn.Linear(hidden_size * 2, n_steps)
 
@@ -307,16 +359,22 @@ class FlexibleBiLSTM_CNN_BiLSTM(nn.Module):
 class FlexibleCNN_Attention_BiGRU(nn.Module):
     """CNN followed by an Attention Mechanism and Bidirectional GRU."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2,
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, am_layers=1, bigru_layers=1,
+                 num_filters=64,
+                 kernel_size=3, pool_size=2,
                  dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, n_layers, pool_size,
-                                                 dropout)
-        self.attention = nn.MultiheadAttention(embed_dim=num_filters * (2 ** (n_layers - 1)), num_heads=1,
+        self.dropout = dropout if bigru_layers > 1 else 0.0  # Adjust dropout for single-layer GRU
+
+        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, cnn_layers, pool_size,
+                                                 self.dropout)
+        self.attention = nn.MultiheadAttention(embed_dim=num_filters * (2 ** (cnn_layers - 1)), num_heads=am_layers,
                                                batch_first=True)
-        self.bigru = nn.GRU(num_filters * (2 ** (n_layers - 1)), hidden_size, n_layers, batch_first=True,
-                            bidirectional=True, dropout=dropout)
+        self.bigru = nn.GRU(
+            num_filters * (2 ** (bigru_layers - 1)), hidden_size, bigru_layers, batch_first=True,
+            bidirectional=True, dropout=self.dropout
+        )
         self.fc = nn.Linear(hidden_size * 2, n_steps)
 
     def _build_cnn_layers(self, in_channels, num_filters, kernel_size, n_layers, pool_size, dropout):
@@ -356,20 +414,25 @@ class FlexibleCNN_Attention_BiGRU(nn.Module):
         return self.fc(out)
 
 
-
 class FlexibleCNN_Attention_BiLSTM(nn.Module):
     """CNN followed by an Attention Mechanism and Bidirectional LSTM."""
 
-    def __init__(self, input_shape, n_steps=10, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2,
+    def __init__(self, input_shape, n_steps=10, hidden_size=100, cnn_layers=1, am_layers=1, bilstm_layers=1,
+                 num_filters=64,
+                 kernel_size=3, pool_size=2,
                  dropout=0.3):
         super().__init__()
         self.input_shape = input_shape
-        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, n_layers, pool_size,
-                                                 dropout)
-        self.attention = nn.MultiheadAttention(embed_dim=num_filters * (2 ** (n_layers - 1)), num_heads=1,
+        self.dropout = dropout if bilstm_layers > 1 else 0.0  # Adjust dropout for single-layer LSTM
+
+        self.cnn_layers = self._build_cnn_layers(self.input_shape[1], num_filters, kernel_size, cnn_layers, pool_size,
+                                                 self.dropout)
+        self.attention = nn.MultiheadAttention(embed_dim=num_filters * (2 ** (cnn_layers - 1)), num_heads=am_layers,
                                                batch_first=True)
-        self.bilstm = nn.LSTM(num_filters * (2 ** (n_layers - 1)), hidden_size, n_layers, batch_first=True,
-                              bidirectional=True, dropout=dropout)
+        self.bilstm = nn.LSTM(
+            num_filters * (2 ** (bilstm_layers - 1)), hidden_size, bilstm_layers, batch_first=True,
+            bidirectional=True, dropout=self.dropout
+        )
         self.fc = nn.Linear(hidden_size * 2, n_steps)
 
     def _build_cnn_layers(self, in_channels, num_filters, kernel_size, n_layers, pool_size, dropout):

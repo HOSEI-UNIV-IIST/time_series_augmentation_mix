@@ -57,12 +57,12 @@ class Trainer:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         # Load and process data
-        self.x_train, self.y_train, self.x_test, self.y_test, self.augmentation_tags, self.duration = self.load_and_prepare_data()
+        self.x_train, self.y_train, self.x_test, self.y_test, self.y_test_min, self.y_test_max, self.augmentation_tags, self.duration = self.load_and_prepare_data()
         self.input_shape = (self.x_train.shape[1], self.x_train.shape[2])
 
         self.model = self.initialize_model()
-        self.optimizer, self.scheduler = self.setup_optimizer_and_scheduler()
         self.nb_epochs = int(np.ceil(args.iterations * (args.batch_size / self.x_train.shape[0])))
+        self.optimizer, self.scheduler = self.setup_optimizer_and_scheduler()
 
         self.criterion = nn.MSELoss()
         self.train_loader = DataLoader(TensorDataset(self.x_train, self.y_train), batch_size=args.batch_size,
@@ -97,7 +97,8 @@ class Trainer:
 
     def load_and_prepare_data(self):
         # Load dataset and check for augmentation
-        x_train, y_train, x_test, y_test, is_augmented, augmentation_method = get_datasets(self.args)
+        x_train, y_train, x_test, y_test, is_augmented, augmentation_method, y_test_min, y_test_max = get_datasets(
+            self.args)
 
         # Skip augmentation if dataset is already augmented
         if is_augmented:
@@ -137,12 +138,17 @@ class Trainer:
         y_train = torch.tensor(y_train, dtype=torch.float32)
         y_test = torch.tensor(y_test, dtype=torch.float32)
 
-        return x_train, y_train, x_test, y_test, augmentation_tags, duration
+        return x_train, y_train, x_test, y_test, y_test_min, y_test_max, augmentation_tags, duration
 
-    def initialize_model(self, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2, dropout=0.2):
+    def initialize_model(self, hidden_size=100, cnn_layers=1, am_layers=1, gru_layers=1, lstm_layers=1, bigru_layers=1,
+                         bilstm_layers=1, bigru1_layers=1, bigru2_layers=1, bilstm1_layers=1, bilstm2_layers=1,
+                         num_filters=64, kernel_size=3, pool_size=2, dropout=0.2):
         model = mod.get_model(self.args.model, self.input_shape, n_steps=self.n_steps, hidden_size=hidden_size,
-                              n_layers=n_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size,
-                              dropout=dropout).to(self.device)
+                              cnn_layers=cnn_layers, am_layers=am_layers, gru_layers=gru_layers,
+                              lstm_layers=lstm_layers, bigru_layers=bigru_layers, bilstm_layers=bilstm_layers,
+                              bigru1_layers=bigru1_layers, bigru2_layers=bigru2_layers, bilstm1_layers=bilstm1_layers,
+                              bilstm2_layers=bilstm2_layers, num_filters=num_filters, kernel_size=kernel_size,
+                              pool_size=pool_size, dropout=dropout).to(self.device)
         return self.wrap_model_with_dataparallel(model)
 
     def wrap_model_with_dataparallel(self, model):
@@ -162,7 +168,8 @@ class Trainer:
         else:
             raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
-        scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=factor, patience=patience, min_lr=1e-7)
+        scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=factor, patience=patience, min_lr=1e-7,
+                                      cooldown=int(np.ceil(self.nb_epochs / 40.)))
         return optimizer, scheduler
 
     def calculate_metrics(self, outputs, labels):
@@ -212,7 +219,7 @@ class Trainer:
         val_accuracies = []
 
         best_val_loss = float('inf')
-        early_stopping_patience = 100 if self.args.model in ["fcnn", "lstm", "gru"] else 20
+        early_stopping_patience = int(self.nb_epochs)
         epochs_no_improve = 0
 
         for epoch in range(self.nb_epochs):
@@ -370,14 +377,35 @@ class Trainer:
                 true_labels.extend(labels.cpu().numpy().flatten())
                 predicted_labels.extend(outputs.cpu().numpy().flatten())
 
+        # Denormalize if needed
+        if self.args.normalize_input:
+            if self.args.normalize_input_positive:
+                # Denormalize for [0, 1] range
+                true_labels = [
+                    label * (self.y_test_max - self.y_test_min) + self.y_test_min for label in true_labels
+                ]
+                predicted_labels = [
+                    pred * (self.y_test_max - self.y_test_min) + self.y_test_min for pred in predicted_labels
+                ]
+            else:
+                # Denormalize for [-1, 1] range
+                true_labels = [
+                    (label + 1) * (self.y_test_max - self.y_test_min) / 2 + self.y_test_min for label in true_labels
+                ]
+                predicted_labels = [
+                    (pred + 1) * (self.y_test_max - self.y_test_min) / 2 + self.y_test_min for pred in predicted_labels
+                ]
+
         # Ensure the "predictions" directory exists
         predictions_dir = os.path.join(self.output_dir, "predictions")
         os.makedirs(predictions_dir, exist_ok=True)
 
         # Plot the true vs. predicted values
+        margin = int(num_samples / 4)
         plt.figure(figsize=(14, 8))
-        plt.plot(true_labels[-num_samples:], color="blue", label="True Labels", linewidth=1)
-        plt.plot(predicted_labels[-num_samples:], color="red", label="Predicted Labels", linestyle="--", linewidth=1)
+        plt.plot(true_labels[-(num_samples + margin):-margin], color="blue", label="True Labels", linewidth=1)
+        plt.plot(predicted_labels[-(num_samples + margin):-margin], color="red", label="Predicted Labels",
+                 linestyle="--", linewidth=1)
         plt.xlabel("Energy Consumption (KVH)")
         plt.ylabel("Predicted Value")
         plt.title(f"True vs Predicted Values for a Subset of Test Set (Last {num_samples} Samples)")
