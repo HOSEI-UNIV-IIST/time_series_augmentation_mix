@@ -15,6 +15,7 @@ Lab: Prof YU Keping's Lab
 
 import os
 
+import numpy as np
 import torch
 
 from models.training import Trainer
@@ -25,8 +26,9 @@ from utils.save_result import save_accuracy
 
 if __name__ == '__main__':
     args = argument_parser()
+    np.random.seed(args.seed)
     look_back = 7
-    n_steps = 7
+    n_steps = 6
     trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
 
     tuner = HyperparametersTuner(trainer, accuracy_weight=0.5, loss_weight=0.5,
@@ -34,11 +36,20 @@ if __name__ == '__main__':
 
     if args.tune:
         print("Starting hyperparameter tuning...")
-        tuner.tune_hyperparameters(n_trials=1)
+        tuner.tune_hyperparameters(n_trials=1)  # 1 for test
         best_params = tuner.load_best_params()
         trainer.model = trainer.initialize_model(
             hidden_size=best_params.get('hidden_size', 100),
-            n_layers=best_params.get('n_layers', 2),
+            cnn_layers=best_params.get('cnn_layers', 2),
+            am_layers=best_params.get('am_layers', 2),
+            gru_layers=best_params.get('gru_layers', 2),
+            lstm_layers=best_params.get('lstm_layers', 2),
+            bigru_layers=best_params.get('bigru_layers', 2),
+            bilstm_layers=best_params.get('bilstm_layers', 2),
+            bigru1_layers=best_params.get('bigru1_layers', 2),
+            bigru2_layers=best_params.get('bigru2_layers', 2),
+            bilstm1_layers=best_params.get('bilstm1_layers', 2),
+            bilstm2_layers=best_params.get('bilstm2_layers', 2),
             num_filters=best_params.get('num_filters', 64),
             kernel_size=best_params.get('kernel_size', 3),
             pool_size=best_params.get('pool_size', 2),
@@ -76,7 +87,7 @@ if __name__ == '__main__':
     save_accuracy(accuracies, f"{args.dataset}_{trainer.augmentation_tags}", trainer.output_dir, file_name,
                   trainer.duration)
 
-    trainer.plot_validation_predictions(num_samples=100)
+    trainer.plot_validation_predictions(num_samples=200)
     #trainer.plot_realtime_predictions(num_samples=100)
 
     # SHAPE OR LIME for  INTERPRETATION

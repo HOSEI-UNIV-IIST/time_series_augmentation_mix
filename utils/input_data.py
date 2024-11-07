@@ -123,7 +123,7 @@ def get_datasets(args):
         x_test = np.expand_dims(x_test, axis=-1)
 
     # Normalize train data if needed
-    if args.normalize_input and not is_train_augmented:
+    if args.normalize_input:
         x_train_min, x_train_max = np.nanmin(x_train), np.nanmax(x_train)
         y_train_min, y_train_max = np.nanmin(y_train), np.nanmax(y_train)
 
@@ -150,4 +150,4 @@ def get_datasets(args):
     x_train = np.nan_to_num(x_train)
     x_test = np.nan_to_num(x_test)
 
-    return x_train, y_train, x_test, y_test, is_train_augmented, augmentation_method
+    return x_train, y_train, x_test, y_test, is_train_augmented, augmentation_method, y_test_min, y_test_max

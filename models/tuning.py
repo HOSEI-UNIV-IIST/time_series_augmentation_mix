@@ -61,28 +61,111 @@ class HyperparametersTuner:
         try:
             # Initialize model and optimizer with suggested parameters
             model_name = self.trainer.args.model
-            if model_name in ["cnn"]:
+
+            if model_name == "cnn":
+                # CNN-only model
                 self.trainer.model = self.trainer.initialize_model(
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    cnn_layers=params.get('cnn_layers', 1),  # Use 'cnn_layers' specifically
+                    dropout=params['dropout']
+                )
+
+            elif model_name == "lstm":
+                # LSTM-only model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    lstm_layers=params.get('lstm_layers', 1),  # Use 'lstm_layers' specifically
+                    dropout=params['dropout']
+                )
+
+            elif model_name == "gru":
+                # GRU-only model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    gru_layers=params.get('gru_layers', 1),  # Use 'gru_layers' specifically
+                    dropout=params['dropout']
+                )
+
+            elif model_name == "cnn_lstm":
+                # CNN-LSTM hybrid model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    cnn_layers=params.get('cnn_layers', 1),
+                    lstm_layers=params.get('lstm_layers', 1),
                     num_filters=params['num_filters'],
                     kernel_size=params['kernel_size'],
                     pool_size=params['pool_size'],
                     dropout=params['dropout']
                 )
-            elif model_name in ["lstm", "gru"]:
+
+            elif model_name == "cnn_gru":
+                # CNN-GRU hybrid model
                 self.trainer.model = self.trainer.initialize_model(
                     hidden_size=params['hidden_size'],
-                    n_layers=params['n_layers'],
-                    dropout=params['dropout']
-                )
-            else:  # Hybrid CNN-RNN models
-                self.trainer.model = self.trainer.initialize_model(
-                    hidden_size=params['hidden_size'],
-                    n_layers=params['n_layers'],
+                    cnn_layers=params.get('cnn_layers', 1),
+                    gru_layers=params.get('gru_layers', 1),
                     num_filters=params['num_filters'],
                     kernel_size=params['kernel_size'],
                     pool_size=params['pool_size'],
                     dropout=params['dropout']
                 )
+
+            elif model_name == "bigru_cnn_bigru":
+                # BiGRU-CNN-BiGRU hybrid model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    cnn_layers=params.get('cnn_layers', 1),
+                    bigru1_layers=params.get('bigru1_layers', 1),
+                    bigru2_layers=params.get('bigru2_layers', 1),
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    dropout=params['dropout']
+                )
+
+            elif model_name == "bilstm_cnn_bilstm":
+                # BiLSTM-CNN-BiLSTM hybrid model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    cnn_layers=params.get('cnn_layers', 1),
+                    bilstm1_layers=params.get('bilstm1_layers', 1),
+                    bilstm2_layers=params.get('bilstm2_layers', 1),
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    dropout=params['dropout']
+                )
+
+            elif model_name == "cnn_attention_bigru":
+                # CNN-Attention-BiGRU model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    cnn_layers=params.get('cnn_layers', 1),
+                    am_layers=params.get('am_layers', 1),
+                    bigru_layers=params.get('bigru_layers', 1),
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    dropout=params['dropout']
+                )
+
+            elif model_name == "cnn_attention_bilstm":
+                # CNN-Attention-BiLSTM model
+                self.trainer.model = self.trainer.initialize_model(
+                    hidden_size=params['hidden_size'],
+                    cnn_layers=params.get('cnn_layers', 1),
+                    am_layers=params.get('am_layers', 1),
+                    bilstm_layers=params.get('bilstm_layers', 1),
+                    num_filters=params['num_filters'],
+                    kernel_size=params['kernel_size'],
+                    pool_size=params['pool_size'],
+                    dropout=params['dropout']
+                )
+
+            else:
+                raise ValueError(f"Model {model_name} not found")
 
             self.trainer.optimizer, self.trainer.scheduler = self.trainer.setup_optimizer_and_scheduler(
                 learning_rate=params['learning_rate'],
@@ -148,13 +231,62 @@ class HyperparametersTuner:
 
         # Sampling based on model type
         if model_name == "cnn":
-            # Only sample CNN-specific parameters
-            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 128, 256]))
+            # CNN-specific parameters
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 128]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
             kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [3, 5]))
             pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.3, 0.5]))
+
+            return {
+                'num_filters': num_filters,
+                'cnn_layers': cnn_layers,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name == "lstm":
+            # LSTM-specific parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100]))
+            lstm_layers = trial.suggest_categorical('lstm_layers', params_config.get('lstm_layers', [1, 2, 3]))
             dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
 
             return {
+                'hidden_size': hidden_size,
+                'lstm_layers': lstm_layers,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name == "gru":
+            # GRU-specific parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100]))
+            gru_layers = trial.suggest_categorical('gru_layers', params_config.get('gru_layers', [1, 2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3]))
+
+            return {
+                'hidden_size': hidden_size,
+                'gru_layers': gru_layers,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name == "cnn_lstm":
+            # CNN-LSTM hybrid parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
+            lstm_layers = trial.suggest_categorical('lstm_layers', params_config.get('lstm_layers', [1, 2, 3]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [3, 5]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2]))
+
+            return {
+                'hidden_size': hidden_size,
+                'cnn_layers': cnn_layers,
+                'lstm_layers': lstm_layers,
                 'num_filters': num_filters,
                 'kernel_size': kernel_size,
                 'pool_size': pool_size,
@@ -162,31 +294,112 @@ class HyperparametersTuner:
                 **self.sample_common_hyperparameters(trial, params_config)
             }
 
-        elif model_name in ["lstm", "gru"]:
-            # Only sample RNN-specific parameters
-            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 200]))
-            n_layers = trial.suggest_categorical('n_layers', params_config.get('n_layers', [1, 2, 3]))
-            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
+        elif model_name == "cnn_gru":
+            # CNN-GRU hybrid parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
+            gru_layers = trial.suggest_categorical('gru_layers', params_config.get('gru_layers', [1, 2, 3]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [3]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3]))
 
             return {
                 'hidden_size': hidden_size,
-                'n_layers': n_layers,
+                'cnn_layers': cnn_layers,
+                'gru_layers': gru_layers,
+                'num_filters': num_filters,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
                 'dropout': dropout,
                 **self.sample_common_hyperparameters(trial, params_config)
             }
 
-        else:
-            # Hybrid CNN-RNN models: sample all relevant parameters
-            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 150]))
-            n_layers = trial.suggest_categorical('n_layers', params_config.get('n_layers', [1, 2]))
-            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [32, 64, 128]))
-            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [3, 5]))
+        elif model_name == "bigru_cnn_bigru":
+            # BiGRU-CNN-BiGRU hybrid parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
+            bigru1_layers = trial.suggest_categorical('bigru1_layers', params_config.get('bigru1_layers', [1, 2, 3]))
+            bigru2_layers = trial.suggest_categorical('bigru2_layers', params_config.get('bigru2_layers', [1, 2, 3]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 96, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [1, 3]))
             pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
             dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
 
             return {
                 'hidden_size': hidden_size,
-                'n_layers': n_layers,
+                'cnn_layers': cnn_layers,
+                'bigru1_layers': bigru1_layers,
+                'bigru2_layers': bigru2_layers,
+                'num_filters': num_filters,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name == "bilstm_cnn_bilstm":
+            # BiLSTM-CNN-BiLSTM hybrid parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
+            bilstm1_layers = trial.suggest_categorical('bilstm1_layers', params_config.get('bilstm1_layers', [1, 2, 3]))
+            bilstm2_layers = trial.suggest_categorical('bilstm2_layers', params_config.get('bilstm2_layers', [1, 2, 3]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [1, 3]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
+
+            return {
+                'hidden_size': hidden_size,
+                'cnn_layers': cnn_layers,
+                'bilstm1_layers': bilstm1_layers,
+                'bilstm2_layers': bilstm2_layers,
+                'num_filters': num_filters,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name == "cnn_attention_bigru":
+            # CNN-Attention-BiGRU hybrid parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 150]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
+            am_layers = trial.suggest_categorical('am_layers', params_config.get('am_layers', [2, 3, 4]))
+            bigru_layers = trial.suggest_categorical('bigru_layers', params_config.get('bigru_layers', [1, 2, 3]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 96, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [1, 3]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
+
+            return {
+                'hidden_size': hidden_size,
+                'cnn_layers': cnn_layers,
+                'am_layers': am_layers,
+                'bigru_layers': bigru_layers,
+                'num_filters': num_filters,
+                'kernel_size': kernel_size,
+                'pool_size': pool_size,
+                'dropout': dropout,
+                **self.sample_common_hyperparameters(trial, params_config)
+            }
+
+        elif model_name == "cnn_attention_bilstm":
+            # CNN-Attention-BiLSTM hybrid parameters
+            hidden_size = trial.suggest_categorical('hidden_size', params_config.get('hidden_size', [50, 100, 150]))
+            cnn_layers = trial.suggest_categorical('cnn_layers', params_config.get('cnn_layers', [1, 2, 3]))
+            am_layers = trial.suggest_categorical('am_layers', params_config.get('am_layers', [2, 3, 4]))
+            bilstm_layers = trial.suggest_categorical('bilstm_layers', params_config.get('bilstm_layers', [1, 2, 3]))
+            num_filters = trial.suggest_categorical('num_filters', params_config.get('num_filters', [64, 96, 128]))
+            kernel_size = trial.suggest_categorical('kernel_size', params_config.get('kernel_size', [1, 3]))
+            pool_size = trial.suggest_categorical('pool_size', params_config.get('pool_size', [2, 3]))
+            dropout = trial.suggest_categorical('dropout', params_config.get('dropout', [0.2, 0.3, 0.5]))
+
+            return {
+                'hidden_size': hidden_size,
+                'cnn_layers': cnn_layers,
+                'am_layers': am_layers,
+                'bilstm_layers': bilstm_layers,
                 'num_filters': num_filters,
                 'kernel_size': kernel_size,
                 'pool_size': pool_size,

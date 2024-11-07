@@ -29,8 +29,6 @@ def run_augmentation_refined(x, y, args):
     :param args: Arguments containing augmentation settings
     :return: Augmented data, augmented labels, and augmentation tags
     """
-    print(f"Augmenting {args.dataset}")
-    np.random.seed(args.seed)
 
     augmentation_tags = args.extra_tag
     ratio = args.augmentation_ratio * 4 if 'sequential' in args.augmentation_method else args.augmentation_ratio
@@ -935,23 +933,22 @@ def adp_parallel_combined1(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Permutation, Rotation, Time Warping, Scaling
     x_permutation = aug.permutation(x_split[0].copy())
     x_rotation = aug.rotation(x_split[1].copy())
     x_time_warp = aug.time_warp(x_split[2].copy())
     x_scaling = aug.scaling(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_permutation, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1)),
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_scaling, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_permutation, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0),
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_scaling, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined1"
+    augmentation_tags = "adp_parallel_combined1"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -961,23 +958,22 @@ def adp_parallel_combined2(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Permutation, Jittering, Time Warping, Magnitude Warping
     x_permutation = aug.permutation(x_split[0].copy())
     x_jitter = aug.jitter(x_split[1].copy())
     x_time_warp = aug.time_warp(x_split[2].copy())
     x_magnitude_warp = aug.magnitude_warp(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_permutation, (ratio, 1)),
-        np.tile(x_jitter, (ratio, 1)),
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_magnitude_warp, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_permutation, ratio, axis=0),
+        np.repeat(x_jitter, ratio, axis=0),
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_magnitude_warp, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined2"
+    augmentation_tags = "adp_parallel_combined2"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -987,23 +983,22 @@ def adp_parallel_combined3(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Permutation, Scaling, Window Slicing, Rotation
     x_permutation = aug.permutation(x_split[0].copy())
     x_scaling = aug.scaling(x_split[1].copy())
     x_window_slice = aug.window_slice(x_split[2].copy())
     x_rotation = aug.rotation(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_permutation, (ratio, 1)),
-        np.tile(x_scaling, (ratio, 1)),
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_permutation, ratio, axis=0),
+        np.repeat(x_scaling, ratio, axis=0),
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined3"
+    augmentation_tags = "adp_parallel_combined3"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1013,23 +1008,22 @@ def adp_parallel_combined4(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Permutation, Magnitude Warping, Window Slicing, Jittering
     x_permutation = aug.permutation(x_split[0].copy())
     x_magnitude_warp = aug.magnitude_warp(x_split[1].copy())
     x_window_slice = aug.window_slice(x_split[2].copy())
     x_jitter = aug.jitter(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_permutation, (ratio, 1)),
-        np.tile(x_magnitude_warp, (ratio, 1)),
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_jitter, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_permutation, ratio, axis=0),
+        np.repeat(x_magnitude_warp, ratio, axis=0),
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_jitter, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined4"
+    augmentation_tags = "adp_parallel_combined4"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1039,23 +1033,22 @@ def adp_parallel_combined5(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Window Slicing, Jittering, Window Warping, Scaling
     x_window_slice = aug.window_slice(x_split[0].copy())
     x_jitter = aug.jitter(x_split[1].copy())
     x_window_warp = aug.window_warp(x_split[2].copy())
     x_scaling = aug.scaling(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_jitter, (ratio, 1)),
-        np.tile(x_window_warp, (ratio, 1)),
-        np.tile(x_scaling, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_jitter, ratio, axis=0),
+        np.repeat(x_window_warp, ratio, axis=0),
+        np.repeat(x_scaling, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined5"
+    augmentation_tags = "adp_parallel_combined5"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1065,23 +1058,22 @@ def adp_parallel_combined6(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Window Slicing, Rotation, Time Warping, Magnitude Warping
     x_window_slice = aug.window_slice(x_split[0].copy())
     x_rotation = aug.rotation(x_split[1].copy())
     x_time_warp = aug.time_warp(x_split[2].copy())
     x_magnitude_warp = aug.magnitude_warp(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1)),
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_magnitude_warp, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0),
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_magnitude_warp, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined6"
+    augmentation_tags = "adp_parallel_combined6"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1091,23 +1083,22 @@ def adp_parallel_combined7(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Window Slicing, Scaling, Window Warping, Jittering
     x_window_slice = aug.window_slice(x_split[0].copy())
     x_scaling = aug.scaling(x_split[1].copy())
     x_window_warp = aug.window_warp(x_split[2].copy())
     x_jitter = aug.jitter(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_scaling, (ratio, 1)),
-        np.tile(x_window_warp, (ratio, 1)),
-        np.tile(x_jitter, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_scaling, ratio, axis=0),
+        np.repeat(x_window_warp, ratio, axis=0),
+        np.repeat(x_jitter, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined7"
+    augmentation_tags = "adp_parallel_combined7"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1117,23 +1108,22 @@ def adp_parallel_combined8(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Time Warping, Rotation, Window Warping, Scaling
     x_time_warp = aug.time_warp(x_split[0].copy())
     x_rotation = aug.rotation(x_split[1].copy())
     x_window_warp = aug.window_warp(x_split[2].copy())
     x_scaling = aug.scaling(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1)),
-        np.tile(x_window_warp, (ratio, 1)),
-        np.tile(x_scaling, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0),
+        np.repeat(x_window_warp, ratio, axis=0),
+        np.repeat(x_scaling, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined8"
+    augmentation_tags = "adp_parallel_combined8"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1143,23 +1133,22 @@ def adp_parallel_combined9(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Time Warping, Jittering, Window Warping, Magnitude Warping
     x_time_warp = aug.time_warp(x_split[0].copy())
     x_jitter = aug.jitter(x_split[1].copy())
     x_window_warp = aug.window_warp(x_split[2].copy())
     x_magnitude_warp = aug.magnitude_warp(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_jitter, (ratio, 1)),
-        np.tile(x_window_warp, (ratio, 1)),
-        np.tile(x_magnitude_warp, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_jitter, ratio, axis=0),
+        np.repeat(x_window_warp, ratio, axis=0),
+        np.repeat(x_magnitude_warp, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined9"
+    augmentation_tags = "adp_parallel_combined9"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1169,23 +1158,22 @@ def adp_parallel_combined10(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Time Warping, Scaling, Window Slicing, Rotation
     x_time_warp = aug.time_warp(x_split[0].copy())
     x_scaling = aug.scaling(x_split[1].copy())
     x_window_slice = aug.window_slice(x_split[2].copy())
     x_rotation = aug.rotation(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_scaling, (ratio, 1)),
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_scaling, ratio, axis=0),
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined10"
+    augmentation_tags = "adp_parallel_combined10"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1195,23 +1183,22 @@ def adp_parallel_combined11(x, y, ratio=1):
 
     x_split, y_split = partition.divide_dataset(x, y, 4)
 
-    # Apply: Time Warping, Rotation, Window Slicing, Magnitude Warping
     x_time_warp = aug.time_warp(x_split[0].copy())
     x_rotation = aug.rotation(x_split[1].copy())
     x_window_slice = aug.window_slice(x_split[2].copy())
     x_magnitude_warp = aug.magnitude_warp(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1)),
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_magnitude_warp, (ratio, 1))
-    ))
+    x_combined = np.concatenate([
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0),
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_magnitude_warp, ratio, axis=0)
+    ])
     y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
     ])
 
-    augmentation_tags = f"adp_parallel_combined11"
+    augmentation_tags = "adp_parallel_combined11"
     return x_combined, y_combined, augmentation_tags
 
 
@@ -1227,15 +1214,19 @@ def adp_parallel_combined12(x, y, ratio=1):
     x_time_warp = aug.time_warp(x_split[2].copy())
     x_rotation = aug.rotation(x_split[3].copy())
 
-    x_combined = np.concatenate((
-        np.tile(x_window_slice, (ratio, 1)),
-        np.tile(x_jitter, (ratio, 1)),
-        np.tile(x_time_warp, (ratio, 1)),
-        np.tile(x_rotation, (ratio, 1))
-    ))
-    y_combined = np.concatenate([
-        np.tile(y_split[i], ratio) for i in range(4)
+    # Explicitly repeat each array along the samples axis
+    x_combined = np.concatenate([
+        np.repeat(x_window_slice, ratio, axis=0),
+        np.repeat(x_jitter, ratio, axis=0),
+        np.repeat(x_time_warp, ratio, axis=0),
+        np.repeat(x_rotation, ratio, axis=0)
     ])
 
-    augmentation_tags = f"adp_parallel_combined12"
+    # Similarly, repeat the corresponding labels
+    y_combined = np.concatenate([
+        np.repeat(y_split[i], ratio, axis=0) for i in range(4)
+    ])
+
+    augmentation_tags = "adp_parallel_combined12"
     return x_combined, y_combined, augmentation_tags
+

@@ -28,6 +28,7 @@ echo "  GPUS: $GPUS"
 echo "  MODEL: $MODEL"
 echo "  OPTIMIZER: $OPTIMIZER"
 echo "  INTERPRET_METHOD: $INTERPRET_METHOD"
+echo "  INTERPRET: $INTERPRET"
 echo "  NORMALIZE_INPUT: $NORMALIZE_INPUT"
 echo "  TRAIN: $TRAIN"
 echo "  TUNE: $TUNE"
@@ -42,9 +43,10 @@ for ratio in $(seq 1); do
       echo "Running dataset: $dataset, augmentation: $aug, ratio: $ratio"
 
       # Construct the command
-      cmd="python3 main.py --gpus=$GPUS --dataset=$dataset --preset_files --augmentation_method=$aug --augmentation_ratio=$ratio --optimizer=$OPTIMIZER --model=$MODEL --interpret_method=$INTERPRET_METHOD"
+      cmd="python3 main.py --gpus=$GPUS --dataset=$dataset --preset_files --augmentation_method=$aug --augmentation_ratio=$ratio --optimizer=$OPTIMIZER --model=$MODEL --interpret --interpret_method=$INTERPRET_METHOD"
 
       # Conditionally add flags for store_true parameters
+      [[ "$INTERPRET" == true ]] && cmd+=" --interpret"
       [[ "$NORMALIZE_INPUT" == true ]] && cmd+=" --normalize_input"
       [[ "$TRAIN" == true ]] && cmd+=" --train"
       [[ "$TUNE" == true ]] && cmd+=" --tune"
