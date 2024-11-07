@@ -30,7 +30,7 @@ def argument_parser():
     parser.add_argument('--save', default=True, action="store_true", help="Save to disk?")
     parser.add_argument('--extension', type=str, default='txt', help="Dataset file extension")
     # Augmentation
-    parser.add_argument('--read_augmented', default=True, action="store_true",
+    parser.add_argument('--read_augmented', default=False, action="store_true",
                         help="Read existing augmented data from disk?")
     parser.add_argument('--augmentation_ratio', type=int, default=1, help="How many times to augment")
     parser.add_argument('--num_augmentations', type=int, default=3, help="Number of random augmentations to apply")

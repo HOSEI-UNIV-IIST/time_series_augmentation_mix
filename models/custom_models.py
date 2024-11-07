@@ -100,12 +100,12 @@ class FlexibleCNN(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size if output_dim >= effective_pool_size else 1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters
             num_filters *= 2
-            output_dim = (output_dim + 1) // effective_pool_size  # Update output dimension for next layer
+            output_dim = max((output_dim + 1) // effective_pool_size, 1)  # Ensure output_dim does not go below 1
 
         self.conv_layers = nn.Sequential(*layers)
         self.fc = nn.Linear(in_channels, n_steps)
@@ -167,7 +167,7 @@ class FlexibleCNN_LSTM(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size), #nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters
@@ -205,7 +205,7 @@ class FlexibleCNN_GRU(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size), #nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters
@@ -246,7 +246,7 @@ class FlexibleBiGRU_CNN_BiGRU(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size), #nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters
@@ -288,7 +288,7 @@ class FlexibleBiLSTM_CNN_BiLSTM(nn.Module):
                 nn.Conv1d(in_channels, num_filters, kernel_size=kernel_size, padding=1),
                 nn.BatchNorm1d(num_filters),
                 nn.ReLU(),
-                nn.MaxPool1d(effective_pool_size),
+                nn.MaxPool1d(effective_pool_size), #nn.MaxPool1d(effective_pool_size) if output_dim >= effective_pool_size else nn.MaxPool1d(1),
                 nn.Dropout(dropout)
             ]
             in_channels = num_filters
