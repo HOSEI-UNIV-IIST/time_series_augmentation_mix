@@ -26,7 +26,7 @@ from utils.save_result import save_accuracy
 if __name__ == '__main__':
     args = argument_parser()
     look_back = 7
-    n_steps = 2
+    n_steps = 7
     trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
 
     tuner = HyperparametersTuner(trainer, accuracy_weight=0.5, loss_weight=0.5,
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         )
 
     if args.train:
-        val_losses, val_accuracies = trainer.train_and_validate(trainer.nb_epochs)
+        val_losses, val_accuracies = trainer.train_and_validate()
         if args.save:
             torch.save(trainer.model.state_dict(),
                        os.path.join(trainer.weight_dir, f"{trainer.model_prefix}_final_weights.pth"))

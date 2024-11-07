@@ -97,7 +97,7 @@ class Trainer:
 
     def load_and_prepare_data(self):
         # Load dataset and check for augmentation
-        x_train_, y_train_, x_test_, y_test_, is_augmented, augmentation_method = get_datasets(self.args)
+        x_train, y_train, x_test, y_test, is_augmented, augmentation_method = get_datasets(self.args)
 
         # Skip augmentation if dataset is already augmented
         if is_augmented:
@@ -108,7 +108,7 @@ class Trainer:
             # Apply augmentation if required
             print(f"Applying augmentation method: {self.args.augmentation_method}")
             started_at = time.time() * 1000
-            x_train, y_train, augmentation_tags = aug.run_augmentation_refined(x_train_, y_train_, self.args)
+            x_train, y_train, augmentation_tags = aug.run_augmentation_refined(x_train, y_train, self.args)
             ended_at = time.time() * 1000
             duration = ended_at - started_at
             print(f"Augmentation process took {duration:.2f} ms")
@@ -116,16 +116,20 @@ class Trainer:
                 f"x_train shape after augmentation: {x_train.shape}, y_train shape after augmentation: {y_train.shape}")
 
             # Save the augmented dataset with the appropriate descriptor and ratio
-            augmentation_file_path = os.path.join(
-                self.args.data_dir, self.args.dataset,
-                f"{self.args.dataset}_TRAIN_{self.args.augmentation_method}.csv"
-            )
-            np.savetxt(augmentation_file_path, np.c_[x_train, y_train], delimiter=";")
-            print(f"Augmented dataset saved at {augmentation_file_path}")
+            #augmentation_file_path = os.path.join(self.args.data_dir, self.args.dataset,f"{self.args.dataset}_TRAIN_{self.args.augmentation_method}.csv")
+            #np.savetxt(augmentation_file_path, np.c_[x_train, y_train], delimiter=";")
+            #print(f"Augmented dataset saved at {augmentation_file_path}")
+
+        # Removing the extra dimension if 3D with last dimension size of 1
+        # TODO: make sure to resect any shapes
+        if x_train.ndim == 3 and x_train.shape[-1] == 1:
+            x_train = np.squeeze(x_train, axis=-1)
+        if x_test.ndim == 3 and x_test.shape[-1] == 1:
+            x_test = np.squeeze(x_test, axis=-1)
 
         # Prepare data for multi-step forecasting
-        x_train, y_train = prepare_multi_step_data(x_train_, y_train_, self.look_back, self.n_steps)
-        x_test, y_test = prepare_multi_step_data(x_test_, y_test_, self.look_back, self.n_steps)
+        x_train, y_train = prepare_multi_step_data(x_train, y_train, self.look_back, self.n_steps)
+        x_test, y_test = prepare_multi_step_data(x_test, y_test, self.look_back, self.n_steps)
 
         # Convert to PyTorch tensors
         x_train = torch.tensor(x_train, dtype=torch.float32)
@@ -137,8 +141,8 @@ class Trainer:
 
     def initialize_model(self, hidden_size=100, n_layers=1, num_filters=64, kernel_size=3, pool_size=2, dropout=0.2):
         model = mod.get_model(self.args.model, self.input_shape, n_steps=self.n_steps, hidden_size=hidden_size,
-                              n_layers=n_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=2,
-                              dropout=0.2).to(self.device)
+                              n_layers=n_layers, num_filters=num_filters, kernel_size=kernel_size, pool_size=pool_size,
+                              dropout=dropout).to(self.device)
         return self.wrap_model_with_dataparallel(model)
 
     def wrap_model_with_dataparallel(self, model):
@@ -203,7 +207,7 @@ class Trainer:
                 metrics['mae'], metrics['mse'], metrics['rmse'], metrics['mape']
             ])
 
-    def train_and_validate(self, nb_epochs):
+    def train_and_validate(self):
         val_losses = []
         val_accuracies = []
 
@@ -211,7 +215,7 @@ class Trainer:
         early_stopping_patience = 100 if self.args.model in ["fcnn", "lstm", "gru"] else 20
         epochs_no_improve = 0
 
-        for epoch in range(nb_epochs):
+        for epoch in range(self.nb_epochs):
             train_loss, train_accu = self.train_one_epoch(epoch)  # Pass epoch to train_one_epoch
             val_loss, val_accuracy = self.validate_one_epoch(epoch)  # Pass epoch to validate_one_epoch
 
@@ -227,7 +231,7 @@ class Trainer:
 
             # Print training and validation metrics for each epoch
             print(
-                f'Epoch {epoch + 1}/{nb_epochs}, '
+                f'Epoch {epoch + 1}/{self.nb_epochs}, '
                 f'Train Loss: {train_loss:.4f}, Train Accuracy: {train_accu:.4f}, '
                 f'Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}'
             )

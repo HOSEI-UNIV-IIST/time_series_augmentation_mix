@@ -115,6 +115,13 @@ def get_datasets(args):
     x_train = pad_sequences(x_train)
     x_test = pad_sequences(x_test)
 
+    # Adding an extra dimension if 2D
+    # TODO: make sure to resect any shapes
+    if x_train.ndim == 2:
+        x_train = np.expand_dims(x_train, axis=-1)
+    if x_test.ndim == 2:
+        x_test = np.expand_dims(x_test, axis=-1)
+
     # Normalize train data if needed
     if args.normalize_input and not is_train_augmented:
         x_train_min, x_train_max = np.nanmin(x_train), np.nanmax(x_train)

@@ -96,8 +96,7 @@ class HyperparametersTuner:
             start_time = time.time()
 
             # Use existing train_and_validate with early stopping
-            nb_epochs = self.trainer.nb_epochs
-            val_losses, val_accuracies = self.trainer.train_and_validate(nb_epochs=nb_epochs)
+            val_losses, val_accuracies = self.trainer.train_and_validate()
 
             # Measure elapsed time and memory
             duration_seconds = time.time() - start_time
