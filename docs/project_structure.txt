@@ -1,0 +1,157 @@
+.
+├── README.md
+├── config
+│   ├── hyperparameters.yml
+│   └── run_params.yaml
+├── data
+│   ├── ELECTRICITY
+│   │   └── ELECTRICITY.txt
+│   ├── meters
+│   │   ├── cleaned
+│   │   │   ├── chilledwater_cleaned.csv
+│   │   │   ├── electricity_cleaned.csv
+│   │   │   ├── gas_cleaned.csv
+│   │   │   ├── hotwater_cleaned.csv
+│   │   │   ├── irrigation_cleaned.csv
+│   │   │   ├── solar_cleaned.csv
+│   │   │   ├── steam_cleaned.csv
+│   │   │   └── water_cleaned.csv
+│   │   └── final
+│   │       ├── ELECTRICITY
+│   │       │   ├── ELECTRICITY_GLOBAL_REACTIVE_POWER.CSV
+│   │       │   ├── ELECTRICITY_GLOBAL_REACTIVE_POWER_test.csv
+│   │       │   └── ELECTRICITY_GLOBAL_REACTIVE_POWER_train.csv
+│   │       ├── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│   │       │   ├── ELECTRICITY_GLOBAL_REACTIVE_POWER.CSV
+│   │       │   ├── ELECTRICITY_GLOBAL_REACTIVE_POWER_TEST.CSV
+│   │       │   └── ELECTRICITY_GLOBAL_REACTIVE_POWER_TRAIN.CSV
+│   │       ├── ELECTRICITY_MOUSE_HEALTH_ESTELA
+│   │       │   ├── ELECTRICITY_MOUSE_HEALTH_ESTELA.CSV
+│   │       │   ├── ELECTRICITY_MOUSE_HEALTH_ESTELA_TEST.CSV
+│   │       │   └── ELECTRICITY_MOUSE_HEALTH_ESTELA_TRAIN.CSV
+│   │       ├── ELECTRICITY_MOUSE_SCIENCE_MICHEAL
+│   │       │   ├── ELECTRICITY_MOUSE_SCIENCE_MICHEAL.CSV
+│   │       │   ├── ELECTRICITY_MOUSE_SCIENCE_MICHEAL_TEST.CSV
+│   │       │   └── ELECTRICITY_MOUSE_SCIENCE_MICHEAL_TRAIN.CSV
+│   │       ├── GAS_PANTHER_EDUCATION_MOHAMMAD
+│   │       │   ├── GAS_PANTHER_EDUCATION_MOHAMMAD.CSV
+│   │       │   ├── GAS_PANTHER_EDUCATION_MOHAMMAD_TEST.CSV
+│   │       │   └── GAS_PANTHER_EDUCATION_MOHAMMAD_TRAIN.CSV
+│   │       ├── GAS_PANTHER_LODGING_DEAN
+│   │       │   ├── GAS_PANTHER_LODGING_DEAN.CSV
+│   │       │   ├── GAS_PANTHER_LODGING_DEAN_TEST.CSV
+│   │       │   └── GAS_PANTHER_LODGING_DEAN_TRAIN.CSV
+│   │       ├── HOTWATER_FOX_LODGING_ALANA
+│   │       │   ├── HOTWATER_FOX_LODGING_ALANA.CSV
+│   │       │   ├── HOTWATER_FOX_LODGING_ALANA_TEST.CSV
+│   │       │   └── HOTWATER_FOX_LODGING_ALANA_TRAIN.CSV
+│   │       ├── HOTWATER_ROBIN_EDUCATION_MARGARITO
+│   │       │   ├── HOTWATER_ROBIN_EDUCATION_MARGARITO.CSV
+│   │       │   ├── HOTWATER_ROBIN_EDUCATION_MARGARITO_TEST.CSV
+│   │       │   └── HOTWATER_ROBIN_EDUCATION_MARGARITO_TRAIN.CSV
+│   │       ├── SOLAR_BOBCAT_EDUCATION_ALISSA
+│   │       │   ├── SOLAR_BOBCAT_EDUCATION_ALISSA.CSV
+│   │       │   ├── SOLAR_BOBCAT_EDUCATION_ALISSA_TEST.CSV
+│   │       │   └── SOLAR_BOBCAT_EDUCATION_ALISSA_TRAIN.CSV
+│   │       ├── SOLAR_BOBCAT_EDUCATION_COLEMAN
+│   │       │   ├── SOLAR_BOBCAT_EDUCATION_COLEMAN.CSV
+│   │       │   ├── SOLAR_BOBCAT_EDUCATION_COLEMAN_TEST.CSV
+│   │       │   └── SOLAR_BOBCAT_EDUCATION_COLEMAN_TRAIN.CSV
+│   │       ├── WATER_PANTHER_LODGING_CORA
+│   │       │   ├── WATER_PANTHER_LODGING_CORA.CSV
+│   │       │   ├── WATER_PANTHER_LODGING_CORA_TEST.CSV
+│   │       │   └── WATER_PANTHER_LODGING_CORA_TRAIN.CSV
+│   │       └── WATER_WOLF_EDUCATION_URSULA
+│   │           ├── WATER_WOLF_EDUCATION_URSULA.CSV
+│   │           ├── WATER_WOLF_EDUCATION_URSULA_TEST.CSV
+│   │           └── WATER_WOLF_EDUCATION_URSULA_TRAIN.CSV
+│   └── weather
+│       └── weather.csv
+├── docs
+│   ├── AugmentationMethods.md
+│   ├── ESAT_model_description.md
+│   ├── MixAugmentation.MD
+│   ├── project_structure.txt
+│   ├── result_ranking_fcnn.md
+│   └── result_ranking_lfcn.md
+├── logs
+│   └── cuda
+│       ├── bilstm_cnn_bilstm
+│       │   └── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│       │       ├── ratio1
+│       │       │   └── back7_step6
+│       │       │       └── ads_sequential_combined4_training_log.csv
+│       │       └── ratio2
+│       │           └── back7_step6
+│       │               └── ads_sequential_combined4_training_log.csv
+│       ├── cnn_attention_bigru
+│       │   ├── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│       │   │   └── ratio1
+│       │   │       └── back7_step6
+│       │   │           ├── ads_sequential_combined12_training_log.csv
+│       │   │           ├── ads_sequential_combined4_training_log.csv
+│       │   │           ├── ads_sequential_combined5_training_log.csv
+│       │   │           └── ads_sequential_combined7_training_log.csv
+│       │   └── HOTWATER_FOX_LODGING_ALANA
+│       │       └── ratio1
+│       │           └── back7_step6
+│       │               ├── ads_sequential_combined4_training_log.csv
+│       │               └── ads_sequential_combined5_training_log.csv
+│       └── cnn_attention_bilstm
+│           └── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│               └── ratio1
+│                   └── back7_step6
+│                       └── ads_sequential_combined4_training_log.csv
+├── main.py
+├── models
+│   ├── __pycache__
+│   │   ├── custom_models.cpython-311.pyc
+│   │   ├── custom_models.cpython-312.pyc
+│   │   ├── mix_augmentation_refined.cpython-311.pyc
+│   │   ├── training.cpython-311.pyc
+│   │   └── tuning.cpython-311.pyc
+│   ├── custom_models.py
+│   ├── mix_augmentation_refined.py
+│   ├── training.py
+│   └── tuning.py
+├── notebooks
+│   └── 01_features_extraction.ipynb
+├── output
+│   └── cuda
+│       ├── bilstm_cnn_bilstm
+│       │   └── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│       │       ├── ratio1
+│       │       │   └── back7_step6
+│       │       └── ratio2
+│       │           └── back7_step6
+│       ├── cnn_attention_bigru
+│       │   ├── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│       │   │   └── ratio1
+│       │   │       └── back7_step6
+│       │   └── HOTWATER_FOX_LODGING_ALANA
+│       │       └── ratio1
+│       │           └── back7_step6
+│       └── cnn_attention_bilstm
+│           └── ELECTRICITY_GLOBAL_REACTIVE_POWER
+│               └── ratio1
+│                   └── back7_step6
+├── requirements.txt
+├── run_gnome.sh
+├── tree.py
+├── utils
+│   ├── argument_parser.py
+│   ├── augmentation.py
+│   ├── cache_loss_accuracy.py
+│   ├── constant.py
+│   ├── data_partitioning.py
+│   ├── datasets.py
+│   ├── dtw.py
+│   ├── helper.py
+│   ├── input_data.py
+│   ├── nemenyi.py
+│   ├── prototype_selection.py
+└── weights
+    ├── cpu
+    └── cuda
+
+72 directories, 129 files
