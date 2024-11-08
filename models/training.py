@@ -15,7 +15,6 @@ Lab: Prof YU Keping's Lab
 # training.py
 
 import csv
-# main.py
 import os
 import time
 
@@ -152,8 +151,11 @@ class Trainer:
         return self.wrap_model_with_dataparallel(model)
 
     def wrap_model_with_dataparallel(self, model):
-        if torch.cuda.is_available() and self.args.gpus > 1:
-            model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+        if torch.cuda.is_available():
+            assert torch.cuda.device_count() >= self.args.gpus, f"Not enough GPUs available. Required: {self.args.gpus}, Available: {torch.cuda.device_count()}"
+            gpu_ids = [i for i in range(self.args.gpus)]
+            os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, gpu_ids))
+            model = nn.DataParallel(model, device_ids=gpu_ids)
         return model.to(self.device)
 
     def setup_optimizer_and_scheduler(self, learning_rate=1e-3, optimizer_type='adam', factor=0.1, patience=10):

@@ -1,0 +1,52 @@
+ai-gpgpu14
+USED GPUs: 2,3
+/home/23r8105_messou/lab/time_series_augmentation_mix
+/var/spool/slurm-llnl/slurmd/job02190/slurm_script: line 8: activate: No such file or directory
+Error: The script directory (/var/spool/slurm-llnl/slurmd/job02190) does not contain '/time_series_augmentation_mix'. Using the default directory.
+Configuration:
+  GPUS: 2
+  MODEL: cnn_attention_bigru
+  OPTIMIZER: adam
+  INTERPRET_METHOD: lime
+  INTERPRET: false
+  NORMALIZE_INPUT: true
+  TRAIN: false
+  TUNE: true
+  SAVE: true
+  gnome_data: ELECTRICITY_GLOBAL_REACTIVE_POWER HOTWATER_FOX_LODGING_ALANA SOLAR_BOBCAT_EDUCATION_ALISSA SOLAR_BOBCAT_EDUCATION_COLEMAN WATER_PANTHER_LODGING_CORA WATER_WOLF_EDUCATION_URSULA GAS_PANTHER_LODGING_DEAN
+  aug_tech_mix: sequential_combined4 sequential_combined5 sequential_combined7 sequential_combined12
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined4, ratio: 1
+Executing: python3 main.py --gpus=2 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined4 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+[I 2024-11-08 22:36:11,339] A new study created in memory with name: no-name-368b1f8e-14cb-45b7-9882-e7f09c8a254d
+[I 2024-11-08 22:36:13,483] Trial 0 pruned. 
+[I 2024-11-08 22:37:40,671] Trial 1 finished with value: -0.12981405123960352 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.28143844887523684, 'patience': 55}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:37:40,674] Trial 2 pruned. 
+[I 2024-11-08 22:37:40,689] Trial 3 pruned. 
+[I 2024-11-08 22:39:37,758] Trial 4 finished with value: -0.06621558854896756 and parameters: {'hidden_size': 150, 'cnn_layers': 3, 'am_layers': 4, 'bigru_layers': 3, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 3, 'dropout': 0.4, 'learning_rate': 0.001, 'optimizer': 'rmsprop', 'factor': 0.18783075418676148, 'patience': 56}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:41:43,783] Trial 5 finished with value: -0.06752453021750149 and parameters: {'hidden_size': 100, 'cnn_layers': 3, 'am_layers': 2, 'bigru_layers': 3, 'num_filters': 96, 'kernel_size': 1, 'pool_size': 2, 'dropout': 0.4, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.27178475683760006, 'patience': 54}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:41:43,805] Trial 6 pruned. 
+[I 2024-11-08 22:43:21,938] Trial 7 finished with value: -0.0417467131327506 and parameters: {'hidden_size': 150, 'cnn_layers': 2, 'am_layers': 4, 'bigru_layers': 2, 'num_filters': 128, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 1e-05, 'optimizer': 'sgd', 'factor': 0.14273157160825886, 'patience': 48}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:44:38,966] Trial 8 finished with value: -0.08167059051763462 and parameters: {'hidden_size': 50, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 64, 'kernel_size': 1, 'pool_size': 3, 'dropout': 0.4, 'learning_rate': 1e-05, 'optimizer': 'rmsprop', 'factor': 0.2677652569818015, 'patience': 52}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:45:54,066] Trial 9 finished with value: -0.04867031928112178 and parameters: {'hidden_size': 100, 'cnn_layers': 1, 'am_layers': 4, 'bigru_layers': 1, 'num_filters': 64, 'kernel_size': 3, 'pool_size': 3, 'dropout': 0.4, 'learning_rate': 1e-05, 'optimizer': 'sgd', 'factor': 0.21335481507786602, 'patience': 57}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:47:21,511] Trial 10 finished with value: -0.065191718180099 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 3, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 1e-06, 'optimizer': 'adam', 'factor': 0.23662024264989326, 'patience': 45}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:48:40,669] Trial 11 finished with value: -0.06807356836458907 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 64, 'kernel_size': 1, 'pool_size': 3, 'dropout': 0.2, 'learning_rate': 0.0001, 'optimizer': 'rmsprop', 'factor': 0.2941732404541372, 'patience': 50}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:50:02,369] Trial 12 finished with value: -0.08734098246622804 and parameters: {'hidden_size': 50, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 64, 'kernel_size': 1, 'pool_size': 3, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.24997766573321586, 'patience': 60}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:51:26,647] Trial 13 finished with value: -0.08225063912953022 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 1, 'pool_size': 3, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.24265692942659245, 'patience': 60}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:52:48,578] Trial 14 finished with value: -0.09520938896041231 and parameters: {'hidden_size': 50, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 64, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.2423465026691499, 'patience': 60}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:52:48,606] Trial 15 pruned. 
+[I 2024-11-08 22:54:15,010] Trial 16 finished with value: -0.09547399974868925 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 3, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.29475468321775733, 'patience': 59}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:55:35,079] Trial 17 finished with value: -0.06519508131291446 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 3, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.0001, 'optimizer': 'sgd', 'factor': 0.2957557491892431, 'patience': 58}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:57:44,507] Trial 18 finished with value: -0.06467071330296224 and parameters: {'hidden_size': 200, 'cnn_layers': 3, 'am_layers': 3, 'bigru_layers': 3, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.10935481733917829, 'patience': 55}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 22:59:29,708] Trial 19 finished with value: -0.08563647396922877 and parameters: {'hidden_size': 200, 'cnn_layers': 2, 'am_layers': 3, 'bigru_layers': 2, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 1e-06, 'optimizer': 'adam', 'factor': 0.2652292955858378, 'patience': 49}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 23:00:49,985] Trial 20 finished with value: -0.07254289707738416 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 3, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.2, 'learning_rate': 0.0001, 'optimizer': 'sgd', 'factor': 0.2969003104456498, 'patience': 58}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 23:02:12,826] Trial 21 finished with value: -0.07785544876823901 and parameters: {'hidden_size': 50, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.24975026298697164, 'patience': 60}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 23:03:35,139] Trial 22 finished with value: -0.07122204285138556 and parameters: {'hidden_size': 100, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 64, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.278787365347505, 'patience': 59}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 23:03:35,154] Trial 23 pruned. 
+[I 2024-11-08 23:04:59,825] Trial 24 finished with value: -0.10376400775445332 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.2579359291254164, 'patience': 59}. Best is trial 1 with value: -0.12981405123960352.
+[I 2024-11-08 23:06:25,429] Trial 25 finished with value: -0.15497647528223615 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 3, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.26082664445781817, 'patience': 54}. Best is trial 25 with value: -0.15497647528223615.
+[I 2024-11-08 23:07:50,134] Trial 26 finished with value: -0.14536656170817738 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.2570440252768851, 'patience': 53}. Best is trial 25 with value: -0.15497647528223615.
+[I 2024-11-08 23:09:14,741] Trial 27 finished with value: -0.12733749336755873 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.21747622898233293, 'patience': 52}. Best is trial 25 with value: -0.15497647528223615.
+[I 2024-11-08 23:09:14,783] Trial 28 pruned. 
+[I 2024-11-08 23:09:14,847] Trial 29 pruned. 
+[I 2024-11-08 23:09:14,908] Trial 30 pruned. 
+[I 2024-11-08 23:10:39,898] Trial 31 finished with value: -0.14208508079004922 and parameters: {'hidden_size': 200, 'cnn_layers': 1, 'am_layers': 2, 'bigru_layers': 1, 'num_filters': 96, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.001, 'optimizer': 'adam', 'factor': 0.22118825817299664, 'patience': 52}. Best is trial 25 with value: -0.15497647528223615.

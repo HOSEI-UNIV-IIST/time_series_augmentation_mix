@@ -37,18 +37,20 @@ echo "  gnome_data: ${gnome_data[@]}"
 echo "  aug_tech_mix: ${aug_tech_mix[@]}"
 
 # Loop through datasets and augmentation methods
-for ratio in $(seq 1); do
+for ratio in $(seq 2); do
   for dataset in "${gnome_data[@]}"; do
     for aug in "${aug_tech_mix[@]}"; do
       echo "Running dataset: $dataset, augmentation: $aug, ratio: $ratio"
 
       # Construct the command
-      cmd="python3 main.py --gpus=$GPUS --dataset=$dataset --preset_files --augmentation_method=$aug --augmentation_ratio=$ratio --optimizer=$OPTIMIZER --model="$MODEL" --interpret --interpret_method=$INTERPRET_METHOD"
+      cmd="python3 main.py --gpus=$GPUS --dataset=$dataset --preset_files --augmentation_method=$aug --augmentation_ratio=2 --optimizer=$OPTIMIZER --model="bilstm_cnn_bilstm" --interpret --interpret_method=$INTERPRET_METHOD --n_trials=100"
 
       # Conditionally add flags for store_true parameters
-      [[ "$INTERPRET" == true ]] && cmd+=" --interpret"
+      #[[ "$INTERPRET" == true ]] && cmd+=" --interpret"
+      cmd+=" --interpret"
       [[ "$NORMALIZE_INPUT" == true ]] && cmd+=" --normalize_input"
-      [[ "$TRAIN" == true ]] && cmd+=" --train"
+      #[[ "$TRAIN" == true ]] && cmd+=" --train"
+      cmd+=" --train"
       [[ "$TUNE" == true ]] && cmd+=" --tune"
       [[ "$SAVE" == true ]] && cmd+=" --save"
 

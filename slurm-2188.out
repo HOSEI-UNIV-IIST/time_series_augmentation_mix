@@ -1,0 +1,284 @@
+ai-gpgpu14
+USED GPUs: 0,1
+/home/23r8105_messou/lab/time_series_augmentation_mix
+/var/spool/slurm-llnl/slurmd/job02188/slurm_script: line 8: activate: No such file or directory
+Error: The script directory (/var/spool/slurm-llnl/slurmd/job02188) does not contain '/time_series_augmentation_mix'. Using the default directory.
+Configuration:
+  GPUS: 4
+  MODEL: cnn_attention_bigru
+  OPTIMIZER: adam
+  INTERPRET_METHOD: lime
+  INTERPRET: false
+  NORMALIZE_INPUT: true
+  TRAIN: false
+  TUNE: true
+  SAVE: true
+  gnome_data: ELECTRICITY_GLOBAL_REACTIVE_POWER HOTWATER_FOX_LODGING_ALANA SOLAR_BOBCAT_EDUCATION_ALISSA SOLAR_BOBCAT_EDUCATION_COLEMAN WATER_PANTHER_LODGING_CORA WATER_WOLF_EDUCATION_URSULA GAS_PANTHER_LODGING_DEAN
+  aug_tech_mix: sequential_combined4 sequential_combined5 sequential_combined7 sequential_combined12
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined4, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined4 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined4
+x_temp.shape: (747, 14, 1), y_temp.shape: (747,)
+x_aug.shape: (1494, 14, 1), y_aug.shape: (1494,)
+Augmentation done: ads_sequential_combined4
+Augmentation process took 185.57 ms
+x_train shape after augmentation: (1494, 14, 1), y_train shape after augmentation: (1494,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined5, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined5 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined5
+x_temp.shape: (747, 14, 1), y_temp.shape: (747,)
+x_aug.shape: (1494, 14, 1), y_aug.shape: (1494,)
+Augmentation done: ads_sequential_combined5
+Augmentation process took 49.69 ms
+x_train shape after augmentation: (1494, 14, 1), y_train shape after augmentation: (1494,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined7, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined7 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined7
+x_temp.shape: (747, 14, 1), y_temp.shape: (747,)
+x_aug.shape: (1494, 14, 1), y_aug.shape: (1494,)
+Augmentation done: ads_sequential_combined7
+Augmentation process took 42.62 ms
+x_train shape after augmentation: (1494, 14, 1), y_train shape after augmentation: (1494,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined12, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined12 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined12
+x_temp.shape: (747, 14, 1), y_temp.shape: (747,)
+x_aug.shape: (1494, 14, 1), y_aug.shape: (1494,)
+Augmentation done: ads_sequential_combined12
+Augmentation process took 132.79 ms
+x_train shape after augmentation: (1494, 14, 1), y_train shape after augmentation: (1494,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+Running dataset: HOTWATER_FOX_LODGING_ALANA, augmentation: sequential_combined4, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=HOTWATER_FOX_LODGING_ALANA --preset_files --augmentation_method=sequential_combined4 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined4
+x_temp.shape: (366, 15, 1), y_temp.shape: (366,)
+x_aug.shape: (732, 15, 1), y_aug.shape: (732,)
+Augmentation done: ads_sequential_combined4
+Augmentation process took 90.72 ms
+x_train shape after augmentation: (732, 15, 1), y_train shape after augmentation: (732,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+Running dataset: HOTWATER_FOX_LODGING_ALANA, augmentation: sequential_combined5, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=HOTWATER_FOX_LODGING_ALANA --preset_files --augmentation_method=sequential_combined5 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined5
+x_temp.shape: (366, 15, 1), y_temp.shape: (366,)
+x_aug.shape: (732, 15, 1), y_aug.shape: (732,)
+Augmentation done: ads_sequential_combined5
+Augmentation process took 21.24 ms
+x_train shape after augmentation: (732, 15, 1), y_train shape after augmentation: (732,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+Running dataset: HOTWATER_FOX_LODGING_ALANA, augmentation: sequential_combined7, ratio: 1
+Executing: python3 main.py --gpus=4 --dataset=HOTWATER_FOX_LODGING_ALANA --preset_files --augmentation_method=sequential_combined7 --augmentation_ratio=1 --optimizer=adam --model=cnn_attention_bigru --interpret --interpret_method=lime --normalize_input --tune --save
+Applying augmentation method: sequential_combined7
+x_temp.shape: (366, 15, 1), y_temp.shape: (366,)
+x_aug.shape: (732, 15, 1), y_aug.shape: (732,)
+Augmentation done: ads_sequential_combined7
+Augmentation process took 20.83 ms
+x_train shape after augmentation: (732, 15, 1), y_train shape after augmentation: (732,)
+Traceback (most recent call last):
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/main.py", line 32, in <module>
+    trainer = Trainer(args, look_back=look_back, n_steps=n_steps)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 62, in __init__
+    self.model = self.initialize_model()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 151, in initialize_model
+    return self.wrap_model_with_dataparallel(model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/lab/time_series_augmentation_mix/models/training.py", line 155, in wrap_model_with_dataparallel
+    model = nn.DataParallel(model, device_ids=list(range(self.args.gpus)))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 160, in __init__
+    _check_balance(self.device_ids)
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/parallel/data_parallel.py", line 27, in _check_balance
+    dev_props = _get_devices_properties(device_ids)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in _get_devices_properties
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 727, in _get_device_attr
+    return get_member(torch.cuda)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/_utils.py", line 750, in <lambda>
+    return [_get_device_attr(lambda m: m.get_device_properties(i)) for i in device_ids]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/cuda/__init__.py", line 468, in get_device_properties
+    raise AssertionError("Invalid device id")
+AssertionError: Invalid device id
+slurmstepd-ai-gpgpu14: error: *** JOB 2188 ON ai-gpgpu14 CANCELLED AT 2024-11-08T22:16:48 ***

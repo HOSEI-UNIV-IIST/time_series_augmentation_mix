@@ -1,0 +1,36 @@
+ai-gpgpu14
+USED GPUs: 6,7
+/home/23r8105_messou/lab/time_series_augmentation_mix
+/var/spool/slurm-llnl/slurmd/job02194/slurm_script: line 8: activate: No such file or directory
+Error: The script directory (/var/spool/slurm-llnl/slurmd/job02194) does not contain '/time_series_augmentation_mix'. Using the default directory.
+Configuration:
+  GPUS: 2
+  MODEL: cnn_attention_bigru
+  OPTIMIZER: adam
+  INTERPRET_METHOD: lime
+  INTERPRET: false
+  NORMALIZE_INPUT: true
+  TRAIN: false
+  TUNE: true
+  SAVE: true
+  gnome_data: ELECTRICITY_GLOBAL_REACTIVE_POWER HOTWATER_FOX_LODGING_ALANA SOLAR_BOBCAT_EDUCATION_ALISSA SOLAR_BOBCAT_EDUCATION_COLEMAN WATER_PANTHER_LODGING_CORA WATER_WOLF_EDUCATION_URSULA GAS_PANTHER_LODGING_DEAN
+  aug_tech_mix: sequential_combined4 sequential_combined5 sequential_combined7 sequential_combined12
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined4, ratio: 1
+Executing: python3 main.py --gpus=2 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined4 --augmentation_ratio=2 --optimizer=adam --model=bilstm_cnn_bilstm --interpret --interpret_method=lime --n_trials=100 --interpret --normalize_input --train --tune --save
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.2 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:08:28,590] A new study created in memory with name: no-name-9f2b5a19-184b-440b-abb2-9d4989f88269
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.2 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:08:30,787] Trial 0 pruned. 
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.3 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:08:30,811] Trial 1 pruned. 
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.5 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:08:30,840] Trial 2 pruned. 
+[I 2024-11-08 23:09:56,402] Trial 3 finished with value: -0.07673593970944674 and parameters: {'hidden_size': 100, 'cnn_layers': 1, 'bilstm1_layers': 1, 'bilstm2_layers': 1, 'num_filters': 64, 'kernel_size': 1, 'pool_size': 3, 'dropout': 0.2, 'learning_rate': 1e-05, 'optimizer': 'adam', 'factor': 0.17183599407048541, 'patience': 45}. Best is trial 3 with value: -0.07673593970944674.
+[I 2024-11-08 23:09:56,434] Trial 4 pruned. 
+[I 2024-11-08 23:09:56,469] Trial 5 pruned. 
+[I 2024-11-08 23:09:56,500] Trial 6 pruned. 
+[I 2024-11-08 23:11:13,696] Trial 7 finished with value: -0.06218918028421654 and parameters: {'hidden_size': 100, 'cnn_layers': 1, 'bilstm1_layers': 1, 'bilstm2_layers': 1, 'num_filters': 64, 'kernel_size': 3, 'pool_size': 3, 'dropout': 0.3, 'learning_rate': 1e-05, 'optimizer': 'sgd', 'factor': 0.17798182929204945, 'patience': 51}. Best is trial 3 with value: -0.07673593970944674.

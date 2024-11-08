@@ -1,0 +1,39 @@
+ai-gpgpu14
+USED GPUs: 4,5
+/home/23r8105_messou/lab/time_series_augmentation_mix
+/var/spool/slurm-llnl/slurmd/job02193/slurm_script: line 8: activate: No such file or directory
+Error: The script directory (/var/spool/slurm-llnl/slurmd/job02193) does not contain '/time_series_augmentation_mix'. Using the default directory.
+Configuration:
+  GPUS: 2
+  MODEL: cnn_attention_bigru
+  OPTIMIZER: adam
+  INTERPRET_METHOD: lime
+  INTERPRET: false
+  NORMALIZE_INPUT: true
+  TRAIN: false
+  TUNE: true
+  SAVE: true
+  gnome_data: ELECTRICITY_GLOBAL_REACTIVE_POWER HOTWATER_FOX_LODGING_ALANA SOLAR_BOBCAT_EDUCATION_ALISSA SOLAR_BOBCAT_EDUCATION_COLEMAN WATER_PANTHER_LODGING_CORA WATER_WOLF_EDUCATION_URSULA GAS_PANTHER_LODGING_DEAN
+  aug_tech_mix: sequential_combined4 sequential_combined5 sequential_combined7 sequential_combined12
+Running dataset: ELECTRICITY_GLOBAL_REACTIVE_POWER, augmentation: sequential_combined4, ratio: 1
+Executing: python3 main.py --gpus=2 --dataset=ELECTRICITY_GLOBAL_REACTIVE_POWER --preset_files --augmentation_method=sequential_combined4 --augmentation_ratio=1 --optimizer=adam --model=bilstm_cnn_bilstm --interpret --interpret_method=lime --n_trials=100 --interpret --normalize_input --train --tune --save
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.2 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:03:21,850] A new study created in memory with name: no-name-8a490f7c-c3ed-4fbc-a060-6a06ccc8fbe6
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.3 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:03:24,176] Trial 0 pruned. 
+[I 2024-11-08 23:03:24,211] Trial 1 pruned. 
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.5 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:04:53,395] Trial 2 finished with value: -0.07594160983861697 and parameters: {'hidden_size': 100, 'cnn_layers': 1, 'bilstm1_layers': 1, 'bilstm2_layers': 1, 'num_filters': 128, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.5, 'learning_rate': 0.0001, 'optimizer': 'adam', 'factor': 0.28927392512905037, 'patience': 55}. Best is trial 2 with value: -0.07594160983861697.
+/home/23r8105_messou/anaconda3/envs/time_series_augmix/lib/python3.12/site-packages/torch/nn/modules/rnn.py:88: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.2 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[I 2024-11-08 23:04:53,418] Trial 3 pruned. 
+[I 2024-11-08 23:04:53,446] Trial 4 pruned. 
+[I 2024-11-08 23:04:53,469] Trial 5 pruned. 
+[I 2024-11-08 23:06:23,614] Trial 6 finished with value: -0.08603854290033128 and parameters: {'hidden_size': 100, 'cnn_layers': 1, 'bilstm1_layers': 2, 'bilstm2_layers': 1, 'num_filters': 128, 'kernel_size': 3, 'pool_size': 3, 'dropout': 0.2, 'learning_rate': 0.0001, 'optimizer': 'sgd', 'factor': 0.2431639739763554, 'patience': 55}. Best is trial 6 with value: -0.08603854290033128.
+[I 2024-11-08 23:06:23,645] Trial 7 pruned. 
+[I 2024-11-08 23:06:23,675] Trial 8 pruned. 
+[I 2024-11-08 23:08:29,290] Trial 9 finished with value: -0.06494595206392037 and parameters: {'hidden_size': 100, 'cnn_layers': 2, 'bilstm1_layers': 3, 'bilstm2_layers': 2, 'num_filters': 64, 'kernel_size': 3, 'pool_size': 2, 'dropout': 0.3, 'learning_rate': 0.0001, 'optimizer': 'rmsprop', 'factor': 0.33946567103660896, 'patience': 56}. Best is trial 6 with value: -0.08603854290033128.
+[I 2024-11-08 23:10:47,676] Trial 10 finished with value: -0.048236768194654646 and parameters: {'hidden_size': 50, 'cnn_layers': 3, 'bilstm1_layers': 2, 'bilstm2_layers': 3, 'num_filters': 128, 'kernel_size': 1, 'pool_size': 3, 'dropout': 0.2, 'learning_rate': 1e-05, 'optimizer': 'sgd', 'factor': 0.3889511896194179, 'patience': 60}. Best is trial 6 with value: -0.08603854290033128.
