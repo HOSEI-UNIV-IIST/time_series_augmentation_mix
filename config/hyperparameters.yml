@@ -6,7 +6,7 @@ cnn:
   learning_rate: [0.0001, 0.0001]
   optimizer: ['adam']
   factor: [0.1, 0.5]
-  patience: [45, 60]
+  patience: [100, 200, 300]
   dropout: [0.3, 0.5]
 
 lstm:
@@ -15,7 +15,7 @@ lstm:
   learning_rate: [0.0001,0.001]
   optimizer: ['adam']
   factor: [0.1, 0.4]
-  patience: [45, 60]
+  patience: [100, 200, 300]
   dropout: [0.2, 0.3, 0.5]
 
 gru:
@@ -64,7 +64,7 @@ bigru_cnn_bigru:
   learning_rate: [0.00001, 0.0001]
   optimizer: ['adam', 'sgd', 'rmsprop']
   factor: [0.1, 0.35]
-  patience: [45, 60]
+  patience: [100, 200, 300]
   dropout: [0.2, 0.3, 0.5]
 
 bilstm_cnn_bilstm:
@@ -78,13 +78,13 @@ bilstm_cnn_bilstm:
   learning_rate: [0.00001, 0.0001]
   optimizer: ['adam', 'sgd', 'rmsprop']
   factor: [0.15, 0.4]
-  patience: [45, 60]
+  patience: [100, 200, 300]
   dropout: [0.2, 0.3, 0.5]
 
 cnn_attention_bigru:
   hidden_size: [50, 100, 150, 200]
   cnn_layers: [ 1, 2, 3 ]
-  am_layers: [ 2, 3, 4 ]
+  am_layers: [ 1, 2 ]
   bigru_layers: [ 1, 2, 3 ]
   num_filters: [64, 96, 128]
   kernel_size: [ 1, 3 ]
@@ -92,13 +92,13 @@ cnn_attention_bigru:
   learning_rate: [0.000001,0.00001, 0.0001, 0.001]
   optimizer: ['adam', 'sgd', 'rmsprop']
   factor: [0.1, 0.3]
-  patience: [45, 60]
+  patience: [100, 200, 300]
   dropout: [0.2, 0.3, 0.4, 0.5]
 
 cnn_attention_bilstm:
   hidden_size: [50, 100, 150, 200]
   cnn_layers: [ 1, 2, 3 ]
-  am_layers: [ 2, 3, 4 ]
+  am_layers: [ 1, 2 ]
   bilstm_layers: [ 1, 2, 3 ]
   num_filters: [64, 96, 128]
   kernel_size: [ 1, 3 ]
@@ -106,5 +106,5 @@ cnn_attention_bilstm:
   learning_rate: [0.000001,0.00001, 0.0001, 0.001]
   optimizer: ['adam', 'sgd', 'rmsprop']
   factor: [0.1, 0.3]
-  patience: [45, 60]
+  patience: [100, 200, 300]
   dropout: [0.2, 0.3, 0.4, 0.5]

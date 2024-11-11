@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     if args.tune:
         print("Starting hyperparameter tuning...")
-        tuner.tune_hyperparameters(n_trials=args.n_trials)  # 1 for test
+        tuner.tune_hyperparameters(n_trials=1)  # 1 for test
         best_params = tuner.load_best_params()
         trainer.model = trainer.initialize_model(
             hidden_size=best_params.get('hidden_size', 100),

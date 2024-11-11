@@ -1,7 +1,9 @@
 
 import os
+
 import numpy as np
 import pandas as pd
+
 
 def pad_sequences(sequences, maxlen=None, dtype='float32', padding='post', truncating='post', value=0.0):
     """
@@ -40,12 +42,18 @@ def load_data_from_file(data_file, label_file=None, is_augmented=False):
         # Load data and labels from a single file, assuming no headers
         raw_data = pd.read_csv(data_file)
         raw_data = raw_data.values
-        if is_augmented:
-            labels = raw_data[:, -1]  # Labels are in the last column for augmented data
-            data = raw_data[:, :-1]   # Features are all columns except the last
-        else:
-            labels = raw_data[:, 0]   # Labels are in the first column for non-augmented data
-            data = raw_data[:, :]    # Features are all columns except the first
+        # if is_augmented:
+        #     labels = raw_data[:, -1]  # Labels are in the last column for augmented data
+        #     data = raw_data[:, :-1]   # Features are all columns except the last
+        # else:
+        #     labels = raw_data[:, 0]   # Labels are in the first column for non-augmented data
+        #     data = raw_data[:, :]    # Features are all columns except the first
+        from sklearn.preprocessing import MinMaxScaler
+        scaler = MinMaxScaler()
+
+        scaled_data = scaler.fit_transform(raw_data)
+        labels = scaled_data[:, 0]
+        data = scaled_data[:, :]
 
     return data, labels
 
@@ -123,31 +131,31 @@ def get_datasets(args):
         x_test = np.expand_dims(x_test, axis=-1)
 
     # Normalize train data if needed
-    if args.normalize_input:
-        x_train_min, x_train_max = np.nanmin(x_train), np.nanmax(x_train)
-        y_train_min, y_train_max = np.nanmin(y_train), np.nanmax(y_train)
-
-        if args.normalize_input_positive:
-            x_train = (x_train - x_train_min) / (x_train_max - x_train_min)
-            y_train = (y_train - y_train_min) / (y_train_max - y_train_min)
-        else:
-            x_train = 2. * (x_train - x_train_min) / (x_train_max - x_train_min) - 1.
-            y_train = 2. * (y_train - y_train_min) / (y_train_max - y_train_min) - 1.
-
-    # Normalize test data independently
-    if test_data_file and args.normalize_input:
-        x_test_min, x_test_max = np.nanmin(x_test), np.nanmax(x_test)
-        y_test_min, y_test_max = np.nanmin(y_test), np.nanmax(y_test)
-
-        if args.normalize_input_positive:
-            x_test = (x_test - x_test_min) / (x_test_max - x_test_min)
-            y_test = (y_test - y_test_min) / (y_test_max - y_test_min)
-        else:
-            x_test = 2. * (x_test - x_test_min) / (x_test_max - x_test_min) - 1.
-            y_test = 2. * (y_test - y_test_min) / (y_test_max - y_test_min) - 1.
+    # if args.normalize_input:
+    #     x_train_min, x_train_max = np.nanmin(x_train), np.nanmax(x_train)
+    #     y_train_min, y_train_max = np.nanmin(y_train), np.nanmax(y_train)
+    #
+    #     if args.normalize_input_positive:
+    #         x_train = (x_train - x_train_min) / (x_train_max - x_train_min)
+    #         y_train = (y_train - y_train_min) / (y_train_max - y_train_min)
+    #     else:
+    #         x_train = 2. * (x_train - x_train_min) / (x_train_max - x_train_min) - 1.
+    #         y_train = 2. * (y_train - y_train_min) / (y_train_max - y_train_min) - 1.
+    #
+    # # Normalize test data independently
+    # if test_data_file and args.normalize_input:
+    #     x_test_min, x_test_max = np.nanmin(x_test), np.nanmax(x_test)
+    #     y_test_min, y_test_max = np.nanmin(y_test), np.nanmax(y_test)
+    #
+    #     if args.normalize_input_positive:
+    #         x_test = (x_test - x_test_min) / (x_test_max - x_test_min)
+    #         y_test = (y_test - y_test_min) / (y_test_max - y_test_min)
+    #     else:
+    #         x_test = 2. * (x_test - x_test_min) / (x_test_max - x_test_min) - 1.
+    #         y_test = 2. * (y_test - y_test_min) / (y_test_max - y_test_min) - 1.
 
     # Replace NaNs with zeroes
     x_train = np.nan_to_num(x_train)
     x_test = np.nan_to_num(x_test)
 
-    return x_train, y_train, x_test, y_test, is_train_augmented, augmentation_method, y_test_min, y_test_max
+    return x_train, y_train, x_test, y_test, is_train_augmented, augmentation_method, None, None

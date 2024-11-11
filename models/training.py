@@ -64,9 +64,9 @@ class Trainer:
         self.optimizer, self.scheduler = self.setup_optimizer_and_scheduler()
 
         self.criterion = nn.MSELoss()
-        self.train_loader = DataLoader(TensorDataset(self.x_train, self.y_train), batch_size=args.batch_size,
+        self.train_loader = DataLoader(TensorDataset(self.x_train, self.y_train), batch_size=int(args.batch_size/2),
                                        shuffle=True)
-        self.test_loader = DataLoader(TensorDataset(self.x_test, self.y_test), batch_size=args.batch_size,
+        self.test_loader = DataLoader(TensorDataset(self.x_test, self.y_test), batch_size=int(args.batch_size/2),
                                       shuffle=False)
 
         self.model_prefix = f"{self.augmentation_tags}"
@@ -104,6 +104,10 @@ class Trainer:
             print("Dataset is already augmented; skipping augmentation.")
             augmentation_tags = augmentation_method or "_original"
             duration = 0  # No augmentation, so no duration time
+        if self.args.original:
+            print("Augmentation method is --original; skipping augmentation.")
+            augmentation_tags = "_original"
+            duration = 0
         else:
             # Apply augmentation if required
             print(f"Applying augmentation method: {self.args.augmentation_method}")
@@ -380,23 +384,23 @@ class Trainer:
                 predicted_labels.extend(outputs.cpu().numpy().flatten())
 
         # Denormalize if needed
-        if self.args.normalize_input:
-            if self.args.normalize_input_positive:
-                # Denormalize for [0, 1] range
-                true_labels = [
-                    label * (self.y_test_max - self.y_test_min) + self.y_test_min for label in true_labels
-                ]
-                predicted_labels = [
-                    pred * (self.y_test_max - self.y_test_min) + self.y_test_min for pred in predicted_labels
-                ]
-            else:
-                # Denormalize for [-1, 1] range
-                true_labels = [
-                    (label + 1) * (self.y_test_max - self.y_test_min) / 2 + self.y_test_min for label in true_labels
-                ]
-                predicted_labels = [
-                    (pred + 1) * (self.y_test_max - self.y_test_min) / 2 + self.y_test_min for pred in predicted_labels
-                ]
+        # if self.args.normalize_input:
+        #     if self.args.normalize_input_positive:
+        #         # Denormalize for [0, 1] range
+        #         true_labels = [
+        #             label * (self.y_test_max - self.y_test_min) + self.y_test_min for label in true_labels
+        #         ]
+        #         predicted_labels = [
+        #             pred * (self.y_test_max - self.y_test_min) + self.y_test_min for pred in predicted_labels
+        #         ]
+        #     else:
+        #         # Denormalize for [-1, 1] range
+        #         true_labels = [
+        #             (label + 1) * (self.y_test_max - self.y_test_min) / 2 + self.y_test_min for label in true_labels
+        #         ]
+        #         predicted_labels = [
+        #             (pred + 1) * (self.y_test_max - self.y_test_min) / 2 + self.y_test_min for pred in predicted_labels
+        #         ]
 
         # Ensure the "predictions" directory exists
         predictions_dir = os.path.join(self.output_dir, "predictions")
@@ -405,12 +409,12 @@ class Trainer:
         # Plot the true vs. predicted values
         margin = int(num_samples / 4)
         plt.figure(figsize=(14, 8))
-        plt.plot(true_labels[-(num_samples + margin):-margin], color="blue", label="True Labels", linewidth=1)
-        plt.plot(predicted_labels[-(num_samples + margin):-margin], color="red", label="Predicted Labels",
+        plt.plot(true_labels[:num_samples], color="blue", label="True Labels", linewidth=1)
+        plt.plot(predicted_labels[:num_samples], color="red", label="Predicted Labels",
                  linestyle="--", linewidth=1)
         plt.xlabel("Energy Consumption (KVH)")
         plt.ylabel("Predicted Value")
-        plt.title(f"True vs Predicted Values for a Subset of Test Set (Last {num_samples} Samples)")
+        plt.title(f"True vs Predicted Values for a Subset of Test Set (First {num_samples} Samples)")
         plt.legend()
 
         # Save the plot

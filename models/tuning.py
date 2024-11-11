@@ -204,6 +204,7 @@ class HyperparametersTuner:
             combined_score = self.loss_weight * final_val_loss - self.accuracy_weight * final_val_accuracy
 
             # Save additional metrics for analysis
+            trial.set_user_attr("combined_score", combined_score)
             trial.set_user_attr("final_val_loss", final_val_loss)
             trial.set_user_attr("final_val_accuracy", final_val_accuracy)
             trial.set_user_attr("duration_hms", duration_hms)
@@ -218,7 +219,7 @@ class HyperparametersTuner:
             trial.set_user_attr("params", params)
 
             # Return combined score for Optuna to minimize
-            return combined_score
+            return final_val_loss
 
         except Exception as e:
             print(f"Trial {trial.number} failed with exception: {e}")

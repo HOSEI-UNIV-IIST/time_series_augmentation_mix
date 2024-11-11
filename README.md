@@ -1,160 +1,44 @@
+# Time Series Augmentation
 
-# Time Series Forecasting Project
+This is a collection of time series data augmentation methods and an example use using PyTorch.
 
-This project focuses on time series forecasting using neural networks. The approach involves data augmentation, custom deep learning models, and hyperparameter optimization. The main objective is to forecast multiple days ahead by analyzing several prior days of data.
+## News
 
-## Table of Contents
-- [Overview](#overview)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Models and Techniques](#models-and-techniques)
-- [Datasets](#datasets)
-- [Acknowledgments](#acknowledgments)
-- [Author](#author)
+- 2024/06/08: Creating Repository
 
----
+## Requires
 
-## Overview
+This code was developed in Python 3.11.0. and requires PyTorch 2.x.x
 
-### Key Components
-1. **Data Augmentation**:
-   - Techniques include time and magnitude transformations based on:
-     > B. K. Iwana and S. Uchida, "An Empirical Survey of Data Augmentation for Time Series Classification with Neural Networks," arXiv, 2020.
+### Normal Install
 
-2. **Custom Models**:
-   - Several deep learning architectures are defined in `custom_models.py`, including:
-     - CNN, LSTM, GRU
-     - Hybrid CNN-RNN models
-     - Attention-based models
-
-3. **Hyperparameter Tuning**:
-   - Using `tuning.py`, Optuna explores a defined search space to find optimal model parameters.
-
-4. **Training and Evaluation**:
-   - The `training.py` script trains and tests models with customizable configurations, managed via **ArgumentParser**.
-
-5. **Datasets**:
-   - Data is sourced from **GNOME Project 2** and organized into `cleaned` and `final` versions for ease of use.
-
-### Forecasting Objective
-- Forecasting future time steps based on a specified lookback period (e.g., given 7 days of past data, forecast the next 6 days).
-
----
-
-## Project Structure
-
-The project directory includes the following key components:
-
-```plaintext
-├── README.md               # Project documentation
-├── config                  # Configuration files for hyperparameters and run parameters
-├── data                    # Dataset files in 'cleaned' and 'final' folders
-├── docs                    # Documentation files
-├── models                  # Custom model definitions, training, and tuning scripts
-├── notebooks               # Jupyter notebooks for data exploration
-├── utils                   # Utility scripts for data processing and augmentation
-├── logs                    # Log files for model training
-├── output                  # Model outputs and results
-├── run_gnome.sh            # Script for running the project
-└── requirements.txt        # Required dependencies
+```
+pip install torch==2.3.1 keras==2.13.1 numpy1.26.4' matplotlib==3.9.0 scikit-image==0.22.0 tqdm==4.66.4
 ```
 
-For a detailed view of the directory structure, see `docs/project_structure.txt`.
+### Dataset
 
----
-
-## Installation
-
-### Step 1: Clone the Repository
-
-```bash
-git clone <repository-url>
-cd <repository-folder>
-```
-
-### Step 2: Install Python Packages
-
-To set up the environment, you can install all dependencies from the `requirements.txt` file:
-
-```bash
-pip install -r requirements.txt
-```
-
-Or manually install the key dependencies as listed below.
-
-#### Core Libraries
-
-```bash
-# PyTorch Installation (adjust for your CUDA version if using a GPU)
-# For CUDA 11.8
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-# For CUDA 12.4
-pip3 install torch torchvision torchaudio
-
-# Other Required Libraries
-pip install numpy==1.26.4 matplotlib~=3.8.0 tqdm==4.66.4 einops==0.8.0
-pip install plotly~=5.22.0 kaleido==0.2.1 scipy==1.14.0 scikit-learn~=1.4.1.post1 pandas
-pip install optuna~=3.6.0 shap~=0.46.0 lime~=0.2.0.1 pyyaml
-```
-
----
+`main.py` is designed to use the UCR Time Series Archive 2018 datasets. To install the datasets, download the .zip file from https://www.cs.ucr.edu/~eamonn/time_series_data_2018/ and extract the contents into the `data` folder.
 
 ## Usage
 
-1. **Configuration**:
-   - Adjust configurations in `config/hyperparameters.yml` and `config/run_params.yaml` to set model parameters and run settings.
+### Description of Time Series Augmentation Methods
 
-2. **Running the Project**:
-   - Use `run_gnome.sh` to train models with specified configurations:
-     ```bash
-     bash run_gnome.sh
-     ```
+[Augmentation description](./docs/AugmentationMethods.md)
 
-3. **Training and Evaluation**:
-   - `training.py` handles both training and testing, allowing dynamic model selection and parameter customization via command-line arguments.
+### Jupyter Example
 
-4. **Hyperparameter Tuning**:
-   - Use `tuning.py` to perform hyperparameter tuning with Optuna:
-     ```bash
-     python tuning.py
-     ```
+[Jupyter Notebook](visual/example.ipynb)
 
----
+### Keras Example
 
-## Models and Techniques
+Example: 
+To **train** a 1D **VGG** on the **FiftyWords** dataset from the **UCR Time Series Archive 2018** with **4x** the training dataset in **Jittering**, use:
 
-- **Data Augmentation**: Implemented in `augmentation.py` with various time and magnitude transformations.
-- **Neural Network Architectures**:
-  - CNN, LSTM, GRU models, and hybrid configurations such as `cnn_lstm`, `cnn_attention_bigru`, and others.
-- **Optimization**:
-  - Optuna is used in `tuning.py` to search for the best hyperparameters within a specified space.
-- **Forecasting Objective**:
-  - Predicts future time steps based on a configurable lookback window, such as 7 days back for a 6-day forecast.
+```
+python3 main.py --gpus=0 --dataset=CBF --preset_files --ucr2018 --normalize_input --train --save --jitter --augmentation_ratio=4 --model=vgg
+```
 
----
+## Original paper from --> Citation
 
-## Datasets
-
-Data is sourced from the **GNOME Project 2**, which includes `cleaned` and `final` versions organized in the `data/` directory. Notebooks for dataset exploration are available in the `notebooks/` directory.
-
----
-
-## Acknowledgments
-
-This project references techniques and methods from:
-- B. K. Iwana and S. Uchida, "An Empirical Survey of Data Augmentation for Time Series Classification with Neural Networks," arXiv, 2020.
-
----
-
-## Author
-
-Created on 11/05/2024  
-🚀 Welcome to the Awesome Python Script 🚀
-
-- **User**: messou
-- **Email**: mesabo18@gmail.com / messouaboya17@gmail.com
-- **GitHub**: [https://github.com/mesabo](https://github.com/mesabo)
-- **University**: Hosei University  
-- **Department**: Science and Engineering  
-- **Lab**: Prof YU Keping's Lab  
+B. K. Iwana and S. Uchida, "An Empirical Survey of Data Augmentation for Time Series Classification with Neural Networks," arXiv, 2020.

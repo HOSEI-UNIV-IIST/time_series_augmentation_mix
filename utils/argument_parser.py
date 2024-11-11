@@ -51,7 +51,7 @@ def argument_parser():
     parser.add_argument('--preset_files', default=False, action="store_true", help="Use preset files")
     parser.add_argument('--ucr', default=False, action="store_true", help="Use UCR 2015")
     parser.add_argument('--ucr2018', default=False, action="store_true", help="Use UCR 2018")
-    parser.add_argument('--data_dir', type=str, default="data/meters/final", help="Data dir")
+    parser.add_argument('--data_dir', type=str, default="data/meters/preprocessed", help="Data dir")
     parser.add_argument('--train_data_file', type=str, default="", help="Train data file")
     parser.add_argument('--train_labels_file', type=str, default="", help="Train label file")
     parser.add_argument('--test_data_file', type=str, default="", help="Test data file")
@@ -70,7 +70,7 @@ def argument_parser():
     parser.add_argument('--validation_split', type=int, default=0, help="Size of validation set")
     parser.add_argument('--n_trials', type=int, default=500, help="Number of Maximum number of trials as search space")
     parser.add_argument('--iterations', type=int, default=10000, help="Number of iterations")
-    parser.add_argument('--batch_size', type=int, default=32, help="Batch size")
+    parser.add_argument('--batch_size', type=int, default=128, help="Batch size")
     parser.add_argument('--verbose', type=int, default=2, help="Verbose")
 
     parser.add_argument('--model', type=str, default="gru",
